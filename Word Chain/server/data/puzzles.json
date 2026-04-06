@@ -1,0 +1,122 @@
+[
+  {
+    "id": 1,
+    "start": "fire",
+    "end": "ice",
+    "solution": ["heat", "summer", "cold"]
+  },
+  {
+    "id": 2,
+    "start": "sun",
+    "end": "night",
+    "solution": ["star", "moon", "dark"]
+  },
+  {
+    "id": 3,
+    "start": "ocean",
+    "end": "desert",
+    "solution": ["wave", "beach", "sand"]
+  },
+  {
+    "id": 4,
+    "start": "sleep",
+    "end": "house",
+    "solution": ["bed", "room", "door"]
+  },
+  {
+    "id": 5,
+    "start": "love",
+    "end": "flower",
+    "solution": ["heart", "red", "rose"]
+  },
+  {
+    "id": 6,
+    "start": "mountain",
+    "end": "river",
+    "solution": ["rock", "stone", "water"]
+  },
+  {
+    "id": 7,
+    "start": "thunder",
+    "end": "power",
+    "solution": ["lightning", "electric", "energy"]
+  },
+  {
+    "id": 8,
+    "start": "forest",
+    "end": "grass",
+    "solution": ["tree", "leaf", "green"]
+  },
+  {
+    "id": 9,
+    "start": "dream",
+    "end": "home",
+    "solution": ["sleep", "bed", "room"]
+  },
+  {
+    "id": 10,
+    "start": "gold",
+    "end": "bee",
+    "solution": ["yellow", "flower", "garden"]
+  },
+  {
+    "id": 11,
+    "start": "crystal",
+    "end": "ocean",
+    "solution": ["pure", "water", "deep"]
+  },
+  {
+    "id": 12,
+    "start": "smoke",
+    "end": "rain",
+    "solution": ["fog", "cloud", "storm"]
+  },
+  {
+    "id": 13,
+    "start": "eagle",
+    "end": "wind",
+    "solution": ["fly", "air", "breeze"]
+  },
+  {
+    "id": 14,
+    "start": "candle",
+    "end": "shadow",
+    "solution": ["light", "dark", "grey"]
+  },
+  {
+    "id": 15,
+    "start": "autumn",
+    "end": "honey",
+    "solution": ["gold", "yellow", "bee"]
+  },
+  {
+    "id": 16,
+    "start": "moon",
+    "end": "fish",
+    "solution": ["tide", "sea", "water"]
+  },
+  {
+    "id": 17,
+    "start": "castle",
+    "end": "star",
+    "solution": ["royal", "crown", "gold"]
+  },
+  {
+    "id": 18,
+    "start": "cave",
+    "end": "snow",
+    "solution": ["rock", "mountain", "cold"]
+  },
+  {
+    "id": 19,
+    "start": "butterfly",
+    "end": "rain",
+    "solution": ["spring", "flower", "cloud"]
+  },
+  {
+    "id": 20,
+    "start": "journey",
+    "end": "cave",
+    "solution": ["discover", "deep", "dark"]
+  }
+]
