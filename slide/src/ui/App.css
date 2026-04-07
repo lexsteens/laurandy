@@ -1,0 +1,289 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #0f0f1a;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+}
+
+.app {
+  max-width: 620px;
+  width: 100%;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.app__title {
+  font-size: 32px;
+  letter-spacing: 8px;
+  color: #6c63ff;
+}
+
+.app__subtitle {
+  color: #888;
+  font-size: 14px;
+  text-align: center;
+}
+
+.app__meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 24px;
+}
+
+.app__puzzle-count {
+  color: #555;
+  font-size: 13px;
+}
+
+.app__found-flash {
+  color: #4caf50;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  animation: fadeOut 0.8s ease forwards;
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-4px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+/* ── Board ─────────────────────────────────────────── */
+
+.board {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+/* ── SlideRow ──────────────────────────────────────── */
+
+.slide-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.slide-row--flash .slide-row__tile--center {
+  background: #1b3a1b;
+  border-color: #4caf50;
+  color: #4caf50;
+  transition:
+    background 0.1s,
+    border-color 0.1s,
+    color 0.1s;
+}
+
+.slide-row__btn {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  background: #1e1e2e;
+  border: 1px solid #3a3a5c;
+  border-radius: 6px;
+  color: #888;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
+  user-select: none;
+}
+
+.slide-row__btn:hover {
+  border-color: #6c63ff;
+  color: #e0e0e0;
+}
+
+.slide-row__tiles-area {
+  width: 444px;
+  flex-shrink: 0;
+  position: relative;
+  height: 52px;
+  cursor: grab;
+  border-radius: 6px;
+}
+
+.slide-row__tiles-area:active {
+  cursor: grabbing;
+}
+
+.slide-row__tiles-area:focus {
+  outline: 2px solid #6c63ff;
+  outline-offset: 2px;
+}
+
+/* center column stripe */
+.slide-row__stripe {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 52px;
+  transform: translateX(-50%);
+  background: rgba(108, 99, 255, 0.07);
+  border-left: 1px solid rgba(108, 99, 255, 0.18);
+  border-right: 1px solid rgba(108, 99, 255, 0.18);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.slide-row__tiles {
+  position: absolute;
+  left: 50%;
+  top: 4px;
+  display: flex;
+  gap: 6px;
+  transition: transform 0.12s ease;
+  z-index: 1;
+}
+
+.slide-row__tile {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0;
+  background: #1e1e2e;
+  border: 1px solid #3a3a5c;
+  border-radius: 6px;
+  color: #c0c0d0;
+  user-select: none;
+  flex-shrink: 0;
+  transition:
+    background 0.12s,
+    border-color 0.12s,
+    color 0.12s;
+}
+
+.slide-row__tile--center {
+  background: #252540;
+  border-color: #6c63ff;
+  color: #e0e0ff;
+}
+
+/* ── FoundWords ────────────────────────────────────── */
+
+.found-words {
+  width: 100%;
+  padding: 16px;
+  background: #14141f;
+  border: 1px solid #2a2a40;
+  border-radius: 8px;
+}
+
+.found-words__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.found-words__medal {
+  font-size: 20px;
+}
+
+.found-words__count {
+  color: #888;
+  font-size: 13px;
+}
+
+.found-words__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+}
+
+.found-words__item {
+  background: #1e1e2e;
+  border: 1px solid #3a3a5c;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: #a5d6a7;
+}
+
+/* ── Hint & Actions ────────────────────────────────── */
+
+.app__hint {
+  color: #888;
+  font-size: 14px;
+  text-align: center;
+}
+
+.app__hint strong {
+  color: #e0e0e0;
+  letter-spacing: 2px;
+}
+
+.app__actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.app__btn {
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+  border: 1px solid transparent;
+}
+
+.app__btn--primary {
+  background: #6c63ff;
+  color: #fff;
+  border-color: #6c63ff;
+}
+
+.app__btn--primary:hover {
+  background: #5a52d5;
+  border-color: #5a52d5;
+}
+
+.app__btn--ghost {
+  background: none;
+  color: #888;
+  border-color: #3a3a5c;
+}
+
+.app__btn--ghost:hover {
+  border-color: #6c63ff;
+  color: #aaa;
+}
