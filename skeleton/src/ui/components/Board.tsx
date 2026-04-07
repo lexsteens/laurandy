@@ -4,31 +4,33 @@ import './Board.css';
 
 type BoardProps = {
   state: GameState;
-  blanks: number[];
   onGuess: (index: number, letter: string) => void;
   onClearFlash: (index: number) => void;
   onSetActive: (index: number | null) => void;
   onPrevBlank: (beforeIndex: number) => void;
+  onUseFreeLetter: (index: number) => void;
 };
 
 function BlankTile({
-  index,
   flash,
   isActive,
+  freeLetterMode,
   inputRef,
   onFocus,
   onGuess,
   onBackspace,
   onClearFlash,
+  onUseFreeLetter,
 }: {
-  index: number;
   flash: 'correct' | 'wrong' | undefined;
   isActive: boolean;
+  freeLetterMode: boolean;
   inputRef: (el: HTMLInputElement | null) => void;
   onFocus: () => void;
   onGuess: (letter: string) => void;
   onBackspace: () => void;
   onClearFlash: () => void;
+  onUseFreeLetter: () => void;
 }) {
   useEffect(() => {
     if (flash) {
@@ -36,6 +38,14 @@ function BlankTile({
       return () => clearTimeout(timer);
     }
   }, [flash, onClearFlash]);
+
+  if (freeLetterMode) {
+    return (
+      <button className="tile tile--free-pick" onClick={onUseFreeLetter}>
+        ?
+      </button>
+    );
+  }
 
   return (
     <input
@@ -64,19 +74,23 @@ function BlankTile({
 
 export function Board({
   state,
-  blanks,
   onGuess,
   onClearFlash,
   onSetActive,
   onPrevBlank,
+  onUseFreeLetter,
 }: BoardProps) {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
-    if (state.activeIndex !== null && inputRefs.current[state.activeIndex]) {
+    if (
+      !state.freeLetterMode &&
+      state.activeIndex !== null &&
+      inputRefs.current[state.activeIndex]
+    ) {
       inputRefs.current[state.activeIndex]?.focus();
     }
-  }, [state.activeIndex]);
+  }, [state.activeIndex, state.freeLetterMode]);
 
   return (
     <div className="board">
@@ -92,9 +106,9 @@ export function Board({
         return (
           <BlankTile
             key={i}
-            index={i}
             flash={state.flash[i]}
             isActive={state.activeIndex === i}
+            freeLetterMode={state.freeLetterMode}
             inputRef={(el) => {
               inputRefs.current[i] = el;
             }}
@@ -102,6 +116,7 @@ export function Board({
             onGuess={(letter) => onGuess(i, letter)}
             onBackspace={() => onPrevBlank(i)}
             onClearFlash={() => onClearFlash(i)}
+            onUseFreeLetter={() => onUseFreeLetter(i)}
           />
         );
       })}

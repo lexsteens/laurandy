@@ -4,6 +4,7 @@ import {
   applyHint,
   guessLetter,
   toggleKeepCorrect,
+  togglePenalizeWrong,
   getBlankIndices,
   getNextBlankIndex,
   getPrevBlankIndex,
@@ -113,12 +114,21 @@ describe('guessLetter', () => {
     expect(next.score).toBe(60); // no cost
   });
 
-  it('wrong guess flashes without penalty', () => {
-    const state = createGame('parent');
+  it('wrong guess flashes with penalty when penalizeWrong is on', () => {
+    const state = createGame('parent'); // penalizeWrong defaults to true
     const next = guessLetter(state, 0, 'x');
     expect(next.tiles[0].visible).toBe(false);
     expect(next.flash[0]).toBe('wrong');
+    expect(next.score).toBe(59); // -1 penalty
+    expect(next.wrongAttempts).toBe(1);
+  });
+
+  it('wrong guess has no penalty when penalizeWrong is off', () => {
+    let state = createGame('parent');
+    state = togglePenalizeWrong(state);
+    const next = guessLetter(state, 0, 'x');
     expect(next.score).toBe(60); // no penalty
+    expect(next.wrongAttempts).toBe(1);
   });
 
   it('does not allow guessing a hinted position', () => {

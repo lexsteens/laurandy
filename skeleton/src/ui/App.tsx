@@ -14,6 +14,9 @@ export function App() {
     onClearFlash,
     onToggleKeep,
     onTogglePenalize,
+    onEnterFreeLetter,
+    onCancelFreeLetter,
+    onUseFreeLetter,
     newGame,
     setActive,
     prevBlank,
@@ -36,16 +39,31 @@ export function App() {
         solved={state.solved}
       />
 
+      {state.freeLetterMode && (
+        <p className="app__free-prompt">
+          Pick a letter to reveal for free!{' '}
+          <button className="app__free-cancel" onClick={onCancelFreeLetter}>
+            Cancel
+          </button>
+        </p>
+      )}
+
       <Board
         state={state}
-        blanks={blanks}
         onGuess={guess}
         onClearFlash={onClearFlash}
         onSetActive={setActive}
         onPrevBlank={prevBlank}
+        onUseFreeLetter={onUseFreeLetter}
       />
 
-      <HintBar onHint={hint} disabled={state.solved} />
+      <HintBar
+        onHint={hint}
+        disabled={state.solved || state.freeLetterMode}
+        freeLetterUsed={state.freeLetterUsed}
+        freeLetterMode={state.freeLetterMode}
+        onEnterFreeLetter={onEnterFreeLetter}
+      />
 
       {state.solved ? (
         <div className="app__result">

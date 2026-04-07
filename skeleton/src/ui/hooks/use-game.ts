@@ -7,6 +7,9 @@ import {
   togglePenalizeWrong,
   clearFlash,
   revealAll,
+  enterFreeLetterMode,
+  cancelFreeLetterMode,
+  applyFreeLetter,
   getNextBlankIndex,
   getPrevBlankIndex,
   getBlankIndices,
@@ -22,18 +25,20 @@ type Action =
   | { type: 'toggle-keep-correct' }
   | { type: 'toggle-penalize-wrong' }
   | { type: 'new-game' }
-  | { type: 'set-active'; index: number | null };
+  | { type: 'set-active'; index: number | null }
+  | { type: 'enter-free-letter-mode' }
+  | { type: 'cancel-free-letter-mode' }
+  | { type: 'use-free-letter'; index: number };
 
 type FullState = GameState & { activeIndex: number | null };
 
 function reducer(state: FullState, action: Action): FullState {
   switch (action.type) {
     case 'hint': {
+      if (state.freeLetterMode) return state; // block hints during free letter pick
       const next = applyHint(state, action.hint);
       if (next === state) return state;
-      // if solved by hint, reveal all
       if (next.solved) return revealAll(next);
-      // update active index if current one got revealed
       const blanks = getBlankIndices(next);
       const activeStillBlank = state.activeIndex !== null && blanks.includes(state.activeIndex);
       return {
@@ -42,12 +47,12 @@ function reducer(state: FullState, action: Action): FullState {
       };
     }
     case 'guess': {
+      if (state.freeLetterMode) return state; // block guesses during free letter pick
       const next = guessLetter(state, action.index, action.letter);
       if (next === state) return state;
       if (next.solved) {
         return { ...revealAll(next), activeIndex: null };
       }
-      // auto-jump to next blank
       const nextBlank = getNextBlankIndex(next, action.index);
       return { ...next, activeIndex: nextBlank };
     }
@@ -57,6 +62,17 @@ function reducer(state: FullState, action: Action): FullState {
       return toggleKeepCorrect(state);
     case 'toggle-penalize-wrong':
       return togglePenalizeWrong(state);
+    case 'enter-free-letter-mode':
+      return enterFreeLetterMode(state);
+    case 'cancel-free-letter-mode':
+      return cancelFreeLetterMode(state);
+    case 'use-free-letter': {
+      const next = applyFreeLetter(state, action.index);
+      if (next === state) return state;
+      if (next.solved) return { ...revealAll(next), activeIndex: null };
+      const blanks = getBlankIndices(next);
+      return { ...next, activeIndex: blanks[0] ?? null };
+    }
     case 'new-game': {
       const fresh = createGame(pickRandomWord());
       return {
@@ -84,6 +100,12 @@ export function useGame() {
   const onClearFlash = useCallback((index: number) => dispatch({ type: 'clear-flash', index }), []);
   const onToggleKeep = useCallback(() => dispatch({ type: 'toggle-keep-correct' }), []);
   const onTogglePenalize = useCallback(() => dispatch({ type: 'toggle-penalize-wrong' }), []);
+  const onEnterFreeLetter = useCallback(() => dispatch({ type: 'enter-free-letter-mode' }), []);
+  const onCancelFreeLetter = useCallback(() => dispatch({ type: 'cancel-free-letter-mode' }), []);
+  const onUseFreeLetter = useCallback(
+    (index: number) => dispatch({ type: 'use-free-letter', index }),
+    [],
+  );
   const newGame = useCallback(() => dispatch({ type: 'new-game' }), []);
   const setActive = useCallback(
     (index: number | null) => dispatch({ type: 'set-active', index }),
@@ -107,6 +129,9 @@ export function useGame() {
     onClearFlash,
     onToggleKeep,
     onTogglePenalize,
+    onEnterFreeLetter,
+    onCancelFreeLetter,
+    onUseFreeLetter,
     newGame,
     setActive,
     prevBlank,

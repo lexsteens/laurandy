@@ -31,3 +31,22 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+.hint-btn--free {
+  border-color: #6c63ff;
+  color: #6c63ff;
+}
+
+.hint-btn--free:hover:not(:disabled) {
+  background: #2a2a5a;
+}
+
+.hint-btn--active {
+  background: #6c63ff;
+  color: white;
+}
+
+.hint-btn--used {
+  text-decoration: line-through;
+  opacity: 0.5;
+}

@@ -4,6 +4,9 @@ import './HintBar.css';
 type HintBarProps = {
   onHint: (hint: HintType) => void;
   disabled: boolean;
+  freeLetterUsed: boolean;
+  freeLetterMode: boolean;
+  onEnterFreeLetter: () => void;
 };
 
 const hints: { type: HintType; label: string }[] = [
@@ -14,10 +17,23 @@ const hints: { type: HintType; label: string }[] = [
   { type: 'odd', label: 'Odd' },
 ];
 
-export function HintBar({ onHint, disabled }: HintBarProps) {
+export function HintBar({
+  onHint,
+  disabled,
+  freeLetterUsed,
+  freeLetterMode,
+  onEnterFreeLetter,
+}: HintBarProps) {
   return (
     <div className="hint-bar">
       <span className="hint-bar__label">Hints:</span>
+      <button
+        className={`hint-btn hint-btn--free ${freeLetterUsed ? 'hint-btn--used' : ''} ${freeLetterMode ? 'hint-btn--active' : ''}`}
+        onClick={onEnterFreeLetter}
+        disabled={disabled || freeLetterUsed}
+      >
+        {freeLetterUsed ? '1 free ✓' : '1 free'}
+      </button>
       {hints.map((h) => (
         <button
           key={h.type}

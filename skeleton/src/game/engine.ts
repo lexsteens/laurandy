@@ -25,6 +25,8 @@ export type GameState = {
   penalizeWrong: boolean;
   solved: boolean;
   wrongAttempts: number;
+  freeLetterUsed: boolean;
+  freeLetterMode: boolean; // true when picking which position to reveal
   history: HistoryEntry[];
   // tracks which position the player is currently typing into
   activeIndex: number | null;
@@ -47,6 +49,8 @@ export function createGame(word: string): GameState {
     penalizeWrong: true,
     solved: false,
     wrongAttempts: 0,
+    freeLetterUsed: false,
+    freeLetterMode: false,
     history: [],
     activeIndex: null,
     flash: {},
@@ -151,6 +155,38 @@ export function toggleKeepCorrect(state: GameState): GameState {
 export function togglePenalizeWrong(state: GameState): GameState {
   if (state.solved) return state;
   return { ...state, penalizeWrong: !state.penalizeWrong };
+}
+
+export function enterFreeLetterMode(state: GameState): GameState {
+  if (state.solved || state.freeLetterUsed) return state;
+  return { ...state, freeLetterMode: true };
+}
+
+export function cancelFreeLetterMode(state: GameState): GameState {
+  return { ...state, freeLetterMode: false };
+}
+
+export function applyFreeLetter(state: GameState, index: number): GameState {
+  if (state.solved || state.freeLetterUsed || !state.freeLetterMode) return state;
+  if (state.tiles[index].visible) return state;
+
+  const tiles = state.tiles.map((tile, i) => {
+    if (i === index) {
+      return { ...tile, visible: true, source: 'hint' as const };
+    }
+    return tile;
+  });
+
+  const solved = tiles.every((t) => t.visible || t.source === 'guess');
+
+  return {
+    ...state,
+    tiles,
+    freeLetterUsed: true,
+    freeLetterMode: false,
+    solved,
+    // no score cost — it's free!
+  };
 }
 
 export function getBlankIndices(state: GameState): number[] {

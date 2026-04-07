@@ -68,6 +68,26 @@ body {
   background: #5a52d5;
 }
 
+.app__free-prompt {
+  text-align: center;
+  color: #6c63ff;
+  font-size: 14px;
+  margin-bottom: -16px;
+}
+
+.app__free-cancel {
+  background: none;
+  border: none;
+  color: #888;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.app__free-cancel:hover {
+  color: #aaa;
+}
+
 .app__skip {
   text-align: center;
   margin-top: 20px;

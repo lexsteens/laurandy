@@ -51,6 +51,31 @@
   color: #a5d6a7;
 }
 
+.tile--free-pick {
+  background: #1a1a2e;
+  border: 2px dashed #6c63ff;
+  color: #6c63ff;
+  cursor: pointer;
+  font-size: 22px;
+  animation: pulse-pick 1s ease-in-out infinite;
+}
+
+.tile--free-pick:hover {
+  background: #2a2a4a;
+  border-color: #8b83ff;
+  color: #8b83ff;
+}
+
+@keyframes pulse-pick {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
 .tile--correct {
   animation: flash-correct 0.4s ease;
 }
