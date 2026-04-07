@@ -2,102 +2,79 @@
 
 ## Purpose
 
-Test whether a compound-word bridge puzzle mechanic is fun. The one question this prototype must answer: **Do players enjoy finding a hidden word that connects two other words?**
+Test whether a compound-word bridge puzzle is fun.
+**Key question**: Do players enjoy finding a hidden word that connects two other words?
 
 ## The Mechanic
 
-Two words are shown — a LEFT word and a RIGHT word. The player must find the HIDDEN word that bridges them, forming valid compound words or common phrases on both sides.
+Two words shown: LEFT and RIGHT. Find HIDDEN such that:
 
-```
-FIRE _____ WORKS
-       ↓
-     WORK
-→ FIREWORK + WORKSHOP?
-```
+- LEFT + HIDDEN = a compound word/phrase
+- HIDDEN + RIGHT = a compound word/phrase
 
-Wait — let me be more precise. The hidden word completes both:
-- LEFT + HIDDEN = a real compound word or phrase
-- HIDDEN + RIGHT = a real compound word or phrase
+Example: `FIRE ___ SHOP` → **WORK** (firework + workshop)
 
-Example: `SUN _ BURN` → HIDDEN = `FLOWER`? No. → HIDDEN = `BURN`? That's RIGHT itself.
-
-Better example puzzles:
-
-| LEFT | HIDDEN | RIGHT | LEFT+HIDDEN | HIDDEN+RIGHT |
-|------|--------|-------|-------------|--------------|
-| FIRE | WORK | SHOP | FIREWORK | WORKSHOP |
-| SNOW | BALL | ROOM | SNOWBALL | BALLROOM |
-| BOOK | MARK | DOWN | BOOKMARK | MARKDOWN |
-| SUN | LIGHT | HOUSE | SUNLIGHT | LIGHTHOUSE |
-| WATER | FALL | OUT | WATERFALL | FALLOUT |
-| BACK | GROUND | WORK | BACKGROUND | GROUNDWORK |
-| HEAD | BAND | WIDTH | HEADBAND | BANDWIDTH |
-| OVER | TIME | LINE | OVERTIME | TIMELINE |
-
-## Stack
-
-| Layer | Tech |
-|-------|------|
-| Frontend | React 18 + Vite |
-| Backend | None — all client-side |
-| Styling | Plain CSS, dark theme |
-
-## Project structure
+## Architecture
 
 ```
 crossfire/
 ├── CLAUDE.md
+├── README.md
 ├── package.json
-├── vite.config.js
+├── vite.config.ts
 ├── index.html
 └── src/
-    ├── main.jsx
-    ├── App.jsx
-    ├── App.css
-    ├── index.css
-    ├── data/
-    │   └── puzzles.js        # hardcoded puzzle list (20–30 puzzles)
-    └── components/
-        ├── GameBoard.jsx      # puzzle display + guess input + feedback
-        └── GameBoard.css
+    ├── game/
+    │   ├── engine.ts          # types + pure functions (createGame, submitGuess, checkAnswer)
+    │   ├── engine.test.ts
+    │   └── puzzles.ts         # hardcoded puzzle data (20-30 puzzles)
+    └── ui/
+        ├── main.tsx
+        ├── App.tsx
+        ├── App.css
+        └── components/
+            ├── PuzzleDisplay.tsx  # LEFT ___ RIGHT display
+            └── GuessInput.tsx
 ```
 
-## Puzzle data format
+## Game logic (`src/game/engine.ts`)
 
-```js
-export const puzzles = [
-  { left: "FIRE", right: "SHOP", answer: "WORK" },
-  { left: "SNOW", right: "ROOM", answer: "BALL" },
-  // ...
-];
+Pure TypeScript, zero dependencies.
+
+```typescript
+type Puzzle = { left: string; right: string; answer: string };
+type GameState = {
+  puzzle: Puzzle;
+  guesses: string[];
+  status: 'playing' | 'won' | 'lost';
+};
+
+function createGame(puzzle: Puzzle): GameState;
+function submitGuess(state: GameState, guess: string): GameState;
 ```
 
-## UI layout
+## Starter puzzles (`src/game/puzzles.ts`)
 
-- Dark background, centered content
-- Title: "CROSSFIRE"
-- The puzzle displayed as: `LEFT  ______  RIGHT` in large text
-- LEFT in warm color (orange), RIGHT in cool color (blue)
-- Below: text input for typing the hidden word + submit button
-- Below: list of previous wrong guesses (crossed out)
-- Max 5 guesses per puzzle
-- "Next puzzle" button after win/loss
-- Puzzle counter: "Puzzle 3 of 20"
+| LEFT  | HIDDEN | RIGHT |
+| ----- | ------ | ----- |
+| FIRE  | WORK   | SHOP  |
+| SNOW  | BALL   | ROOM  |
+| BOOK  | MARK   | DOWN  |
+| SUN   | LIGHT  | HOUSE |
+| WATER | FALL   | OUT   |
+| BACK  | GROUND | WORK  |
+| HEAD  | BAND   | WIDTH |
+| OVER  | TIME   | LINE  |
 
-## Key rules
+Add 12–22 more to reach 20–30 total.
 
+## UI rules
+
+- Dark theme, centered
+- LEFT in orange, RIGHT in blue, input between them
 - Case-insensitive comparison
-- Input auto-focuses, submit on Enter
-- On correct guess: reveal the hidden word in green between LEFT and RIGHT, show the two compound words formed below
-- On wrong guess: add to wrong guesses list, shake input
-- After 5 wrong guesses: reveal the answer
-- Cycle through puzzles randomly (don't repeat until all played)
-- Save nothing to localStorage — stateless prototype
-
-## What NOT to build
-
-- No streak tracking or daily mode
-- No share card
-- No hint system
-- No animations beyond basic feedback
-- No external dependencies
+- Auto-focus input, submit on Enter
+- Max 5 guesses. Wrong guesses shown crossed out
+- On win: reveal hidden word in green, show both compound words
+- "Next puzzle" button, puzzle counter
+- No localStorage, no streaks, no external deps

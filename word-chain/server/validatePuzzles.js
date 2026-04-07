@@ -23,7 +23,7 @@ for (const puzzle of puzzles) {
     allOk = false;
     console.log(`Puzzle ${puzzle.id}: ${puzzle.start} → ... → ${puzzle.end}`);
     console.log(`  Chain: ${chain.join(' → ')}`);
-    broken.forEach(b => console.log(b));
+    broken.forEach((b) => console.log(b));
     console.log();
   }
 }

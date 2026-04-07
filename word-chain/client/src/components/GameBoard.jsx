@@ -24,7 +24,7 @@ export default function GameBoard({ puzzle, onNewPuzzle }) {
     next[index] = value.toLowerCase().replace(/[^a-z]/g, '');
     setInputs(next);
     // Clear validation state for this input when it changes
-    setInputStates(prev => {
+    setInputStates((prev) => {
       const s = [...prev];
       s[index] = null;
       return s;
@@ -74,12 +74,9 @@ export default function GameBoard({ puzzle, onNewPuzzle }) {
     const prev = prevWordFor(index);
     const next = nextWordFor(index);
 
-    const [linkIn, linkOut] = await Promise.all([
-      checkLink(prev, word),
-      checkLink(word, next),
-    ]);
+    const [linkIn, linkOut] = await Promise.all([checkLink(prev, word), checkLink(word, next)]);
 
-    setInputStates(s => {
+    setInputStates((s) => {
       const next = [...s];
       next[index] = linkIn && linkOut ? 'valid' : 'invalid';
       return next;
@@ -88,7 +85,7 @@ export default function GameBoard({ puzzle, onNewPuzzle }) {
 
   async function handleSubmit() {
     if (gameState !== 'playing') return;
-    const chain = [puzzle.start, ...inputs.map(w => w.trim()).filter(Boolean), puzzle.end];
+    const chain = [puzzle.start, ...inputs.map((w) => w.trim()).filter(Boolean), puzzle.end];
     if (chain.length < 3) return; // need at least 1 middle word
 
     setChecking(true);
@@ -101,7 +98,7 @@ export default function GameBoard({ puzzle, onNewPuzzle }) {
       const data = await res.json();
 
       // Map link results back to input indices
-      const filledIndices = inputs.map((w, i) => ({ w: w.trim(), i })).filter(x => x.w);
+      const filledIndices = inputs.map((w, i) => ({ w: w.trim(), i })).filter((x) => x.w);
       const newStates = [...inputStates];
       filledIndices.forEach(({ i }, chainPos) => {
         // link into this word = data.links[chainPos], link out = data.links[chainPos + 1]
@@ -130,7 +127,7 @@ export default function GameBoard({ puzzle, onNewPuzzle }) {
     setTimeout(() => inputRefs.current[0]?.focus(), 50);
   }
 
-  const anyFilled = inputs.some(w => w.trim().length > 0);
+  const anyFilled = inputs.some((w) => w.trim().length > 0);
 
   return (
     <div className="game-board">
@@ -151,12 +148,12 @@ export default function GameBoard({ puzzle, onNewPuzzle }) {
           <div key={i} className="chain-item">
             <div className="word-node">
               <input
-                ref={el => (inputRefs.current[i] = el)}
+                ref={(el) => (inputRefs.current[i] = el)}
                 className={`word-input ${inputStates[i] === 'invalid' ? 'input-invalid' : ''} ${inputStates[i] === 'valid' ? 'input-valid' : ''}`}
                 type="text"
                 value={word}
-                onChange={e => handleChange(i, e.target.value)}
-                onKeyDown={e => handleKeyDown(i, e)}
+                onChange={(e) => handleChange(i, e.target.value)}
+                onKeyDown={(e) => handleKeyDown(i, e)}
                 onBlur={() => handleBlur(i)}
                 placeholder={`step ${i + 1} (optional)`}
                 maxLength={20}
@@ -187,9 +184,7 @@ export default function GameBoard({ puzzle, onNewPuzzle }) {
       )}
 
       {gameState === 'failed' && (
-        <div className="result-banner result-failed">
-          Some links are broken — try again.
-        </div>
+        <div className="result-banner result-failed">Some links are broken — try again.</div>
       )}
 
       <div className="actions">
@@ -222,9 +217,7 @@ export default function GameBoard({ puzzle, onNewPuzzle }) {
         )}
       </div>
 
-      <p className="hint">
-        Use 1–3 steps. Empty slots are skipped.
-      </p>
+      <p className="hint">Use 1–3 steps. Empty slots are skipped.</p>
     </div>
   );
 }

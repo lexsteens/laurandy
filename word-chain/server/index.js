@@ -29,7 +29,7 @@ app.get('/api/puzzle/random', (req, res) => {
 
 // GET /api/puzzle/:id
 app.get('/api/puzzle/:id', (req, res) => {
-  const puzzle = puzzles.find(p => p.id === parseInt(req.params.id));
+  const puzzle = puzzles.find((p) => p.id === parseInt(req.params.id));
   if (!puzzle) return res.status(404).json({ error: 'Puzzle not found' });
   res.json({ id: puzzle.id, start: puzzle.start, end: puzzle.end });
 });
@@ -59,7 +59,7 @@ app.post('/api/validate', (req, res) => {
     });
   }
 
-  const allValid = results.every(r => r.valid);
+  const allValid = results.every((r) => r.valid);
   res.json({ valid: allValid, links: results });
 });
 

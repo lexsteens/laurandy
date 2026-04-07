@@ -1,6 +1,6 @@
 # Game Design Overview — Laurent's Initial Research
 
-*Captured from Laurent's conversation with Claude, Apr 5–6 2026.*
+_Captured from Laurent's conversation with Claude, Apr 5–6 2026._
 
 ## Context
 
@@ -21,23 +21,26 @@ Laurent and Andy are building small casual puzzle games together — for fun, fo
 
 ## Games Selected
 
-| Game | Mechanic | Competition | Complexity |
-|------|----------|-------------|------------|
-| **Skeleton** | Every-other-letter is revealed (e.g. `_A_E_T`), guess the full word | Very low | Easy |
-| **Crossfire** | Find the hidden word bridging two compound words (e.g. `FIRE ___ SHOP` → WORK) | Very low | Medium |
-| **Slide** | Slide horizontal word-rows left/right to align a vertical word in the center column | Very low | Medium |
+| Game          | Mechanic                                                                            | Competition | Complexity |
+| ------------- | ----------------------------------------------------------------------------------- | ----------- | ---------- |
+| **Skeleton**  | Every-other-letter is revealed (e.g. `_A_E_T`), guess the full word                 | Very low    | Easy       |
+| **Crossfire** | Find the hidden word bridging two compound words (e.g. `FIRE ___ SHOP` → WORK)      | Very low    | Medium     |
+| **Slide**     | Slide horizontal word-rows left/right to align a vertical word in the center column | Very low    | Medium     |
 
 ### Skeleton
+
 - Proven letter-based mechanic, no dominant player in the space
 - Simple to build and test
 - Recommended as the first game to build (warmup)
 
 ### Crossfire
+
 - Compound word bridge — 8 validated example puzzles provided
 - Puzzle quality is critical — generate and validate 20–30 puzzles before building the UI
 - Medium complexity
 
 ### Slide
+
 - Most original concept, highest "wow" factor
 - Laurent refined the design: no pre-designated key letter index, dictionary-based validation, multiple valid vertical words with medal scoring (🥉🥈🥇)
 - Arrow buttons are the primary input, mouse drag secondary
@@ -47,21 +50,21 @@ Laurent and Andy are building small casual puzzle games together — for fun, fo
 
 ## Games & Ideas Considered but Not Selected
 
-| Idea | Why Not |
-|------|---------|
-| Hyper-casual / Arcade | Oversaturated market, UA costs killed solo dev profitability |
-| RPG / Strategy | Huge content pipeline, long dev cycles, players expect constant updates |
-| French Wordle clone | Already 5–6 clones (Motle by Larousse, LeMOT, etc.) |
-| Word Association Chain | Built as first prototype (`Word Chain/`), but Laurent pivoted to letter-based mechanics for the next games |
-| Daily Logic Grid | Solid concept, not selected |
-| Trivia with confidence slider | Not selected |
-| Riddle of the Day | Not selected |
-| Odd One Out | Not selected |
-| The Witness (metaphorical clues) | 100% LLM-generated, very original, but Laurent preferred simpler letter-guessing |
-| Temperature / Semantle-like | Already exists in English |
-| Ghost Letters | Low competition, interesting mechanic, but passed over |
-| Unscramble Under Pressure | Unscramble genre is saturated |
-| Impostor (find the fake word) | Good option, low competition, but not selected |
+| Idea                             | Why Not                                                                                                    |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Hyper-casual / Arcade            | Oversaturated market, UA costs killed solo dev profitability                                               |
+| RPG / Strategy                   | Huge content pipeline, long dev cycles, players expect constant updates                                    |
+| French Wordle clone              | Already 5–6 clones (Motle by Larousse, LeMOT, etc.)                                                        |
+| Word Association Chain           | Built as first prototype (`word-chain/`), but Laurent pivoted to letter-based mechanics for the next games |
+| Daily Logic Grid                 | Solid concept, not selected                                                                                |
+| Trivia with confidence slider    | Not selected                                                                                               |
+| Riddle of the Day                | Not selected                                                                                               |
+| Odd One Out                      | Not selected                                                                                               |
+| The Witness (metaphorical clues) | 100% LLM-generated, very original, but Laurent preferred simpler letter-guessing                           |
+| Temperature / Semantle-like      | Already exists in English                                                                                  |
+| Ghost Letters                    | Low competition, interesting mechanic, but passed over                                                     |
+| Unscramble Under Pressure        | Unscramble genre is saturated                                                                              |
+| Impostor (find the fake word)    | Good option, low competition, but not selected                                                             |
 
 ---
 
@@ -76,13 +79,13 @@ Laurent and Andy are building small casual puzzle games together — for fun, fo
 
 ## Tech Stack
 
-| Layer | Choice | Reason |
-|-------|--------|--------|
-| Prototype frontend | React 18 + Vite | Fast iteration, no app store friction, web-first validation |
-| Mobile (future) | Flutter | Native IAP, AdMob, push notifications, App Store discoverability |
-| Backend (future) | Supabase | Works for both React and Flutter, free tier |
-| Puzzle generation | Anthropic / OpenAI API | Offline batch generation, programmatic validation |
-| Generation pipeline | Python script | Orchestrates LLM prompt → JSON → validator → puzzle store |
+| Layer               | Choice                 | Reason                                                           |
+| ------------------- | ---------------------- | ---------------------------------------------------------------- |
+| Prototype frontend  | React 18 + Vite        | Fast iteration, no app store friction, web-first validation      |
+| Mobile (future)     | Flutter                | Native IAP, AdMob, push notifications, App Store discoverability |
+| Backend (future)    | Supabase               | Works for both React and Flutter, free tier                      |
+| Puzzle generation   | Anthropic / OpenAI API | Offline batch generation, programmatic validation                |
+| Generation pipeline | Python script          | Orchestrates LLM prompt → JSON → validator → puzzle store        |
 
 ---
 
@@ -96,12 +99,13 @@ Deferred until a game is validated as fun. Key data points from Laurent's resear
 - **IAP and AdMob work much better in native apps** — primary reason to go Flutter eventually
 
 ### Realistic income tiers
-| Tier | Revenue | What it takes |
-|------|---------|---------------|
-| Flop (most common) | $0–$500 total | No marketing, buried in App Store |
-| Modest hit | $500–$5k/month | Few thousand DAU, decent retention |
-| Living wage | $5k–$15k/month | 50k–200k downloads, strong retention + marketing |
-| Breakout | $15k–$100k+/month | Viral moment, press, or App Store feature |
+
+| Tier               | Revenue           | What it takes                                    |
+| ------------------ | ----------------- | ------------------------------------------------ |
+| Flop (most common) | $0–$500 total     | No marketing, buried in App Store                |
+| Modest hit         | $500–$5k/month    | Few thousand DAU, decent retention               |
+| Living wage        | $5k–$15k/month    | 50k–200k downloads, strong retention + marketing |
+| Breakout           | $15k–$100k+/month | Viral moment, press, or App Store feature        |
 
 Realistic timeline: 6–18 months to first meaningful revenue. Most solo devs release 2–3 games before one hits.
 

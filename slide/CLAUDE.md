@@ -2,120 +2,90 @@
 
 ## Purpose
 
-Test whether a row-sliding vertical word puzzle mechanic is fun and satisfying to interact with. The one question this prototype must answer: **Does sliding rows to align a vertical word feel good and create interesting "aha" moments?**
+Test whether a row-sliding vertical word puzzle is fun and satisfying.
+**Key question**: Does sliding rows to align a vertical word feel good and create "aha" moments?
 
 ## The Mechanic
 
-The board shows 4–6 horizontal rows, each containing a real word. Each row can slide left and right independently. The middle column reads vertically — the player must slide rows until the middle column spells a valid word.
+4–6 horizontal rows, each a real word. Each row slides left/right independently. The middle column reads vertically — slide rows until it spells a valid word.
 
 ```
-→  C A [R] O T        slide row 1
-→  T [A] B L E        slide row 2
-→  C [I] T Y          slide row 3
-→  P [N] K            slide row 4
+→  C A [R] O T
+→  T [A] B L E
+→  C [I] T Y
+→  P [N] K
         ↓
-      RAIN ← hidden vertical word
+      RAIN
 ```
 
-### Key design decisions
+- No pre-designated key letter — any letter can land in center
+- Dictionary-based validation: whatever's in the middle column gets checked
+- Multiple valid words possible — player keeps exploring for bonus words
+- Scoring: 🥉 = 1 word, 🥈 = 2, 🥇 = 3+
 
-- **No key letter index**: the puzzle format is just `{ word }` per row. Any letter in the row can land in the center — the game doesn't pre-designate which letter is "correct"
-- **Dictionary-based validation**: whatever lands in the middle column gets checked against a word list. If it's a valid word, it counts
-- **Multiple valid words**: rows don't lock when a word is found. The player keeps sliding to hunt for bonus words. Scoring: 🥉 = 1 word, 🥈 = 2 words, 🥇 = 3+ words
-
-## Stack
-
-| Layer | Tech |
-|-------|------|
-| Frontend | React 18 + Vite |
-| Backend | None — all client-side |
-| Styling | Plain CSS, dark theme |
-
-## Project structure
+## Architecture
 
 ```
 slide/
 ├── CLAUDE.md
+├── README.md
 ├── package.json
-├── vite.config.js
+├── vite.config.ts
 ├── index.html
 └── src/
-    ├── main.jsx
-    ├── App.jsx
-    ├── App.css
-    ├── index.css
-    ├── data/
-    │   ├── puzzles.js        # 15–20 puzzles, each is an array of row words
-    │   └── wordList.js       # dictionary of valid 4–6 letter words for vertical checking
-    └── components/
-        ├── GameBoard.jsx      # sliding rows + vertical column check
-        ├── GameBoard.css
-        ├── SlideRow.jsx       # single row with slide controls
-        └── SlideRow.css
+    ├── game/
+    │   ├── engine.ts          # types + pure functions (createGame, slideRow, readCenter, checkWord)
+    │   ├── engine.test.ts
+    │   ├── puzzles.ts         # 15-20 puzzles (arrays of row words)
+    │   └── word-list.ts       # valid 3-6 letter words for vertical checking
+    └── ui/
+        ├── main.tsx
+        ├── App.tsx
+        ├── App.css
+        └── components/
+            ├── Board.tsx
+            ├── SlideRow.tsx   # single row with ← → buttons + drag
+            └── FoundWords.tsx # list of discovered words + medal
 ```
 
-## Puzzle data format
+## Game logic (`src/game/engine.ts`)
 
-```js
-export const puzzles = [
-  {
-    rows: ["CARROT", "TABLE", "CITY", "PINK"],
-    // no key indices — any vertical alignment that forms a word counts
-  },
-  // ...
-];
+Pure TypeScript, zero dependencies.
+
+```typescript
+type GameState = {
+  rows: { word: string; offset: number }[];
+  foundWords: string[];
+  status: 'playing' | 'done';
+};
+
+function createGame(words: string[]): GameState;
+function slideRow(state: GameState, rowIndex: number, direction: -1 | 1): GameState;
+function readCenterColumn(state: GameState): string;
+function checkForNewWord(state: GameState, wordList: Set<string>): GameState;
 ```
-
-Each row word can be different lengths. The middle column position is `Math.floor(word.length / 2)` at the initial (centered) position. As the row slides, different letters pass through the center.
-
-## UI layout
-
-- Dark background, centered content
-- Title: "SLIDE"
-- The board: rows of letter tiles, horizontally scrollable
-- Each row has **← and → arrow buttons** on the sides (primary input method)
-- Mouse drag to slide a row (secondary — mousedown/mousemove/mouseup on the row)
-- The middle column highlighted with a subtle vertical stripe or different background
-- Below the board: found words list (shows words discovered so far)
-- Medal indicator: 🥉🥈🥇 based on words found
-- "Next puzzle" button
-- Puzzle counter
-
-## Input handling (web only)
-
-1. **Arrow buttons** — always visible on each side of each row. Click to shift row by one position
-2. **Mouse drag** — mousedown on a row, mousemove shifts it, mouseup snaps to nearest letter alignment
-3. **Keyboard** — click a row to select it, then use ← → arrow keys
-
-No touch/swipe handling — this is a web validation prototype.
 
 ## Sliding mechanics
 
-- Each row has an `offset` (integer, starts at 0)
-- offset -1 = shifted one letter left, offset +1 = shifted one letter right
-- Clamp offset so at least one letter remains visible in the center column
-- The letter at position `Math.floor(word.length / 2) - offset` is in the center column
-- After each slide, read the center column top-to-bottom and check against the word list
+- `offset` = integer, starts at 0. Negative = shifted left, positive = right
+- Center letter = `word[Math.floor(word.length / 2) - offset]`
+- Clamp so at least one letter remains in center column
+- After each slide: read center column, check against word list
 
-## Word detection
+## Input (web only)
 
-- After any row slides, read the vertical word from the center column
-- Check if it exists in the word list (case-insensitive)
-- If it's a new valid word: add to found words, flash the column green briefly
-- Don't lock rows — player keeps exploring
+1. **← → arrow buttons** on each row (primary)
+2. **Mouse drag** on row (secondary)
+3. **Keyboard arrows** when row is focused
 
-## Key rules
+No touch/swipe — web validation prototype only.
 
-- Show the center column letters clearly at all times
-- Visual feedback when a word is found (brief highlight)
-- Show all found words in a list below the board
-- "Give up" button reveals one possible valid word
-- Save nothing to localStorage
+## UI rules
 
-## What NOT to build
-
-- No touch/swipe handling
-- No streak tracking or daily mode
-- No share card
-- No complex animations (just basic CSS transitions for sliding)
-- No external dependencies
+- Dark theme, letter tiles in a grid
+- Subtle vertical stripe highlighting the center column
+- Brief green flash when a word is found
+- Found words list below board with medal indicator
+- "Give up" reveals one possible word
+- "Next puzzle" button, puzzle counter
+- No localStorage, no streaks, no external deps

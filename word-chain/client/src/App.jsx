@@ -36,9 +36,7 @@ export default function App() {
       <main>
         {loading && <div className="status-message">Loading puzzle...</div>}
         {error && <div className="status-message error">{error}</div>}
-        {puzzle && !loading && (
-          <GameBoard puzzle={puzzle} onNewPuzzle={fetchPuzzle} />
-        )}
+        {puzzle && !loading && <GameBoard puzzle={puzzle} onNewPuzzle={fetchPuzzle} />}
       </main>
     </div>
   );

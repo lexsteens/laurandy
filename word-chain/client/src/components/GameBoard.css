@@ -58,7 +58,9 @@
   outline: none;
   text-align: center;
   text-transform: lowercase;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
 }
 
 .word-input::placeholder {
@@ -156,7 +158,9 @@
   border: none;
   border-radius: 0.75rem;
   cursor: pointer;
-  transition: opacity 0.15s, transform 0.1s;
+  transition:
+    opacity 0.15s,
+    transform 0.1s;
 }
 
 .btn:active {

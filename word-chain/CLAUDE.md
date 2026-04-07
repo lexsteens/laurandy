@@ -8,11 +8,11 @@ Shorter solutions are rewarded — if you find a 1-step path, that's better than
 
 ## Stack
 
-| Layer | Tech |
-|-------|------|
-| Frontend | React 18 + Vite (port 5173 in dev) |
-| Backend | Node.js + Express (port **3002** in dev) |
-| Monorepo | npm workspaces (`client/`, `server/`) |
+| Layer    | Tech                                     |
+| -------- | ---------------------------------------- |
+| Frontend | React 18 + Vite (port 5173 in dev)       |
+| Backend  | Node.js + Express (port **3002** in dev) |
+| Monorepo | npm workspaces (`client/`, `server/`)    |
 
 ## Running the app
 
@@ -47,12 +47,12 @@ npm run start      # runs production server (serves built client)
 
 ## API endpoints
 
-| Method | Path | Body | Returns |
-|--------|------|------|---------|
-| GET | `/api/puzzle/random` | — | `{ id, start, end }` |
-| GET | `/api/puzzle/:id` | — | `{ id, start, end }` |
-| POST | `/api/check-link` | `{ from, to }` | `{ valid: bool }` |
-| POST | `/api/validate` | `{ chain: string[] }` | `{ valid: bool, links: [{from,to,valid}] }` |
+| Method | Path                 | Body                  | Returns                                     |
+| ------ | -------------------- | --------------------- | ------------------------------------------- |
+| GET    | `/api/puzzle/random` | —                     | `{ id, start, end }`                        |
+| GET    | `/api/puzzle/:id`    | —                     | `{ id, start, end }`                        |
+| POST   | `/api/check-link`    | `{ from, to }`        | `{ valid: bool }`                           |
+| POST   | `/api/validate`      | `{ chain: string[] }` | `{ valid: bool, links: [{from,to,valid}] }` |
 
 `chain` must be 3–5 words (start + 1–3 middle + end). The solution is never sent to the client.
 
