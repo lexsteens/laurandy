@@ -269,19 +269,23 @@ export const words = [
 
 let usedIndices = new Set<number>();
 
-export function pickRandomWord(): string {
+export function pickRandomWord(previousLength?: number): string {
   // reset if all words have been used
   if (usedIndices.size >= words.length) {
     usedIndices = new Set();
   }
 
-  let index: number;
-  do {
-    index = Math.floor(Math.random() * words.length);
-  } while (usedIndices.has(index));
+  // prefer a different word length than the previous word
+  const available = words
+    .map((w, i) => ({ word: w, index: i }))
+    .filter(({ index }) => !usedIndices.has(index));
 
-  usedIndices.add(index);
-  return words[index];
+  const differentLength = available.filter(({ word }) => word.length !== previousLength);
+  const pool = differentLength.length > 0 ? differentLength : available;
+
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  usedIndices.add(pick.index);
+  return pick.word;
 }
 
 export function resetUsedWords(): void {

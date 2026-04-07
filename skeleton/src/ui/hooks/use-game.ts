@@ -74,7 +74,7 @@ function reducer(state: FullState, action: Action): FullState {
       return { ...next, activeIndex: blanks[0] ?? null };
     }
     case 'new-game': {
-      const fresh = createGame(pickRandomWord());
+      const fresh = createGame(pickRandomWord(state.target.length));
       return {
         ...fresh,
         history: state.history,
