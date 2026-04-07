@@ -1,0 +1,73 @@
+.history {
+  margin-top: 40px;
+  border-top: 1px solid #2a2a4a;
+  padding-top: 20px;
+}
+
+.history__title {
+  color: #666;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+}
+
+.history__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.history__entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #1a1a2e;
+  border-radius: 6px;
+}
+
+.history__word {
+  display: flex;
+  gap: 2px;
+}
+
+.history__letter {
+  font-family: 'Courier New', monospace;
+  font-weight: 700;
+  font-size: 16px;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+.history__letter--hint {
+  color: #a0a0c0;
+  background: #2a2a4a;
+}
+
+.history__letter--guess {
+  color: #a5d6a7;
+  background: #1b3a1e;
+}
+
+.history__letter--none {
+  color: #a5d6a7;
+  background: #1b3a1e;
+}
+
+.history__stats {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.history__score {
+  color: #6c63ff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.history__wrong {
+  color: #b71c1c;
+  font-size: 12px;
+}

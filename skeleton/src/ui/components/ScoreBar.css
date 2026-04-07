@@ -20,6 +20,12 @@
   margin-left: 4px;
 }
 
+.score-bar__toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .score-bar__toggle {
   display: flex;
   align-items: center;

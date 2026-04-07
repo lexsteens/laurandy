@@ -4,6 +4,7 @@ import {
   applyHint,
   guessLetter,
   toggleKeepCorrect,
+  togglePenalizeWrong,
   clearFlash,
   revealAll,
   getNextBlankIndex,
@@ -19,6 +20,7 @@ type Action =
   | { type: 'guess'; index: number; letter: string }
   | { type: 'clear-flash'; index: number }
   | { type: 'toggle-keep-correct' }
+  | { type: 'toggle-penalize-wrong' }
   | { type: 'new-game' }
   | { type: 'set-active'; index: number | null };
 
@@ -53,8 +55,17 @@ function reducer(state: FullState, action: Action): FullState {
       return clearFlash(state, action.index);
     case 'toggle-keep-correct':
       return toggleKeepCorrect(state);
-    case 'new-game':
-      return createGame(pickRandomWord());
+    case 'toggle-penalize-wrong':
+      return togglePenalizeWrong(state);
+    case 'new-game': {
+      const fresh = createGame(pickRandomWord());
+      return {
+        ...fresh,
+        history: state.history,
+        penalizeWrong: state.penalizeWrong,
+        keepCorrect: state.keepCorrect,
+      };
+    }
     case 'set-active':
       return { ...state, activeIndex: action.index };
     default:
@@ -72,6 +83,7 @@ export function useGame() {
   );
   const onClearFlash = useCallback((index: number) => dispatch({ type: 'clear-flash', index }), []);
   const onToggleKeep = useCallback(() => dispatch({ type: 'toggle-keep-correct' }), []);
+  const onTogglePenalize = useCallback(() => dispatch({ type: 'toggle-penalize-wrong' }), []);
   const newGame = useCallback(() => dispatch({ type: 'new-game' }), []);
   const setActive = useCallback(
     (index: number | null) => dispatch({ type: 'set-active', index }),
@@ -94,6 +106,7 @@ export function useGame() {
     guess,
     onClearFlash,
     onToggleKeep,
+    onTogglePenalize,
     newGame,
     setActive,
     prevBlank,

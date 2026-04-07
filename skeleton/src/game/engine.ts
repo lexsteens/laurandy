@@ -8,13 +8,24 @@ export type TileState = {
 
 export type HintType = 'odd' | 'even' | 'vowels' | 'first' | 'last';
 
+export type HistoryEntry = {
+  word: string;
+  tiles: TileState[];
+  score: number;
+  maxScore: number;
+  wrongAttempts: number;
+};
+
 export type GameState = {
   target: string;
   tiles: TileState[];
   score: number;
   maxScore: number;
   keepCorrect: boolean;
+  penalizeWrong: boolean;
   solved: boolean;
+  wrongAttempts: number;
+  history: HistoryEntry[];
   // tracks which position the player is currently typing into
   activeIndex: number | null;
   // flash feedback: index → 'correct' | 'wrong', cleared after animation
@@ -33,7 +44,10 @@ export function createGame(word: string): GameState {
     score: target.length * 10,
     maxScore: target.length * 10,
     keepCorrect: true,
+    penalizeWrong: true,
     solved: false,
+    wrongAttempts: 0,
+    history: [],
     activeIndex: null,
     flash: {},
   };
@@ -113,9 +127,12 @@ export function guessLetter(state: GameState, index: number, letter: string): Ga
     };
   }
 
-  // wrong guess — just flash, no penalty
+  // wrong guess — flash, optional penalty
+  const wrongPenalty = state.penalizeWrong ? 1 : 0;
   return {
     ...state,
+    score: Math.max(0, state.score - wrongPenalty),
+    wrongAttempts: state.wrongAttempts + 1,
     flash: { ...state.flash, [index]: 'wrong' },
   };
 }
@@ -129,6 +146,11 @@ export function clearFlash(state: GameState, index: number): GameState {
 export function toggleKeepCorrect(state: GameState): GameState {
   if (state.solved) return state;
   return { ...state, keepCorrect: !state.keepCorrect };
+}
+
+export function togglePenalizeWrong(state: GameState): GameState {
+  if (state.solved) return state;
+  return { ...state, penalizeWrong: !state.penalizeWrong };
 }
 
 export function getBlankIndices(state: GameState): number[] {
@@ -155,9 +177,18 @@ function isSolved(target: string, tiles: TileState[]): boolean {
 
 // For revealing all letters when player solves
 export function revealAll(state: GameState): GameState {
+  const finalTiles = state.tiles.map((tile) => ({ ...tile, visible: true }));
+  const entry: HistoryEntry = {
+    word: state.target,
+    tiles: finalTiles,
+    score: state.score,
+    maxScore: state.maxScore,
+    wrongAttempts: state.wrongAttempts,
+  };
   return {
     ...state,
-    tiles: state.tiles.map((tile) => ({ ...tile, visible: true })),
+    tiles: finalTiles,
     solved: true,
+    history: [...state.history, entry],
   };
 }
