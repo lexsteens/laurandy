@@ -18,7 +18,9 @@ Small browser-based puzzle games by Laurent and Andy. Each game lives in its own
 
 ## Architecture
 
-**Game logic is separated from rendering.** Each game follows this structure:
+**Game logic is separated from rendering.** Two layers, strict import direction.
+
+### Folder structure (per game)
 
 ```
 game-name/
@@ -26,15 +28,30 @@ game-name/
 ├── README.md
 ├── package.json
 ├── src/
-│   ├── game/            # pure TypeScript — NO framework deps
-│   │   ├── engine.ts    # types, state, pure functions (create, update, check)
-│   │   └── engine.test.ts
-│   └── ui/              # React components — reads state, dispatches actions
-│       ├── App.tsx
+│   ├── game/                # LAYER 1 — pure TypeScript, zero dependencies
+│   │   ├── types.ts         # state types, action types
+│   │   ├── engine.ts        # pure functions: (state, action) → newState
+│   │   ├── engine.test.ts   # unit tests (no DOM, no React)
+│   │   └── data.ts          # word lists, puzzle data, constants
+│   └── ui/                  # LAYER 2 — React renderer
+│       ├── App.tsx           # useReducer(gameReducer, initialState)
+│       ├── App.css
+│       ├── hooks/
+│       │   └── use-game.ts  # wraps useReducer + game engine
 │       └── components/
+│           ├── Board.tsx
+│           └── Board.css
 ```
 
-- `src/game/` — pure functions: `(state, action) → newState`. Testable without a browser. No React, no DOM.
+### Import rules
+
+```
+game/  ←──  ui/       ✅  ui/ imports from game/
+game/  ──→  ui/       ❌  game/ NEVER imports from ui/
+game/  ──→  react     ❌  game/ NEVER imports React or DOM APIs
+```
+
+- `src/game/` — pure functions: `(state, action) → newState`. Testable without a browser.
 - `src/ui/` — React renders state via `useReducer`. The game logic IS the reducer.
 - This separation allows: unit tests, CLI debugging, JSON state dumps, swapping renderers.
 

@@ -2,71 +2,55 @@
 
 ## Purpose
 
-Test whether an alternating-letters word guessing mechanic is fun.
-**Key question**: Do players enjoy deducing a word from every-other-letter hints?
+Test whether a progressive-hint word guessing mechanic is fun.
+**Key question**: Is the hint-vs-score tradeoff engaging? Do players want to play again?
 
 ## The Mechanic
 
-Player sees a word with every other letter revealed:
+1. Player sees all blanks: `_ _ _ _ _ _` (word length is known)
+2. Hint buttons reveal letters (cost 1 point each): "show odd", "show even", "show vowels", "show first", "show last"
+3. At any point, player types into remaining blank positions (auto-jump between blanks)
+4. Per-letter feedback: correct → green + locked, wrong → red flash + clears (no penalty)
+5. Toggle "keep correct letters" — ON: greens stay visible (costs 1 point per kept letter). OFF: flash green then disappear
 
-```
-_ A _ E _ T
-```
+## Scoring
 
-Guess the complete word. 5 attempts max. Color feedback on hidden positions (green/yellow/grey like Wordle).
+- Start with `10 × word.length` points
+- Each letter revealed by a hint: −1 point
+- Each correct letter kept visible (toggle ON): −1 point
+- Wrong letters: no penalty (just flash red and clear)
+- Final score = starting points − hints used − letters kept
 
 ## Architecture
 
 ```
 skeleton/
-├── CLAUDE.md
-├── README.md
-├── package.json
-├── vite.config.ts
-├── index.html
-└── src/
-    ├── game/
-    │   ├── engine.ts          # types + pure functions (createGame, submitGuess, getSkeleton)
-    │   └── engine.test.ts     # unit tests — no DOM
-    └── ui/
-        ├── main.tsx
-        ├── App.tsx
-        ├── App.css
-        └── components/
-            ├── Board.tsx      # skeleton display + feedback tiles
-            └── GuessInput.tsx # text input + submit
+├── src/
+│   ├── game/
+│   │   ├── engine.ts        # types + pure functions
+│   │   ├── engine.test.ts   # unit tests
+│   │   └── words.ts         # word list
+│   └── ui/
+│       ├── main.tsx
+│       ├── App.tsx
+│       ├── App.css
+│       ├── hooks/
+│       │   └── use-game.ts  # useReducer wrapping engine
+│       └── components/
+│           ├── Board.tsx     # letter tiles (blank, revealed, correct)
+│           ├── HintBar.tsx   # hint buttons with labels
+│           └── ScoreBar.tsx  # score + keep-correct toggle
 ```
 
 ## Game logic (`src/game/engine.ts`)
 
-Pure TypeScript, zero dependencies.
-
-```typescript
-type GameState = {
-  target: string;
-  skeleton: string; // e.g. "_A_E_T"
-  guesses: Guess[];
-  status: 'playing' | 'won' | 'lost';
-};
-type LetterResult = 'correct' | 'present' | 'absent' | 'revealed';
-type Guess = { word: string; results: LetterResult[] };
-
-function createGame(word: string): GameState;
-function submitGuess(state: GameState, guess: string): GameState;
-function getSkeleton(word: string): string; // reveals even-index letters
-```
-
-State managed via `useReducer` in React — game functions are the reducer.
-
-## Word list
-
-Hardcode 50–100 common English words (5–8 letters) in `src/game/words.ts`. Pick random word each session.
+Pure TypeScript, zero dependencies. Import rules: `ui/` imports `game/`, never reverse.
 
 ## UI rules
 
 - Dark theme, centered, monospace tiles
-- Auto-focus input, submit on Enter
-- Reject guesses that aren't the right length
-- Show guess count: "Guess 2 of 5"
-- "New word" button after win/loss
-- No localStorage, no streaks, no daily mode, no external deps
+- Auto-jump to next blank after typing a letter
+- Backspace jumps to previous blank
+- Show current score prominently
+- "New word" button after solving
+- No localStorage, no streaks, no external deps

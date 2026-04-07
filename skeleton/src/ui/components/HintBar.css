@@ -1,0 +1,33 @@
+.hint-bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.hint-bar__label {
+  color: #888;
+  font-size: 14px;
+  margin-right: 4px;
+}
+
+.hint-btn {
+  background: #2a2a4a;
+  border: 1px solid #3a3a5c;
+  color: #c0c0e0;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.hint-btn:hover:not(:disabled) {
+  background: #3a3a6a;
+}
+
+.hint-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

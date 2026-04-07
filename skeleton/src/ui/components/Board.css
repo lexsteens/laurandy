@@ -1,0 +1,84 @@
+.board {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin: 32px 0;
+}
+
+.tile {
+  width: 52px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+  border-radius: 6px;
+  text-transform: uppercase;
+  transition:
+    background-color 0.15s,
+    border-color 0.15s;
+}
+
+.tile--blank {
+  background: #1a1a2e;
+  border: 2px solid #3a3a5c;
+  color: #e0e0e0;
+  text-align: center;
+  caret-color: transparent;
+  outline: none;
+  cursor: pointer;
+}
+
+.tile--blank:focus,
+.tile--active {
+  border-color: #6c63ff;
+  box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.3);
+}
+
+.tile--revealed {
+  border: 2px solid transparent;
+}
+
+.tile--hint {
+  background: #2a2a4a;
+  color: #a0a0c0;
+}
+
+.tile--guess {
+  background: #1b5e20;
+  color: #a5d6a7;
+}
+
+.tile--correct {
+  animation: flash-correct 0.4s ease;
+}
+
+.tile--wrong {
+  animation: flash-wrong 0.4s ease;
+}
+
+@keyframes flash-correct {
+  0% {
+    background: #1b5e20;
+  }
+  50% {
+    background: #2e7d32;
+  }
+  100% {
+    background: #1a1a2e;
+  }
+}
+
+@keyframes flash-wrong {
+  0% {
+    background: #b71c1c;
+  }
+  50% {
+    background: #c62828;
+  }
+  100% {
+    background: #1a1a2e;
+  }
+}
