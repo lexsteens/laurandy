@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { initialState, move } from '../game/engine';
 import { getDailyPuzzle } from '../game/puzzles';
 import type { Direction, GameState } from '../game/types';
+import { wordList } from '../game/word-list';
 import { Grid } from './components/Grid';
 
-const STORAGE_KEY = 'sokoword-v1';
+const STORAGE_KEY = 'sokoword-v2';
 const MAX_HISTORY = 100;
 
 interface SavedData {
@@ -17,12 +18,16 @@ function todayStr(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-function loadSaved(puzzleId: number): GameState[] | null {
+function loadSaved(puzzleId: number, wordSet: Set<string>): GameState[] | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const data = JSON.parse(raw) as SavedData;
     if (data.date !== todayStr() || data.puzzleId !== puzzleId) return null;
+    // Re-validate the saved history is non-empty and has correct shape
+    if (!Array.isArray(data.history) || data.history.length === 0) return null;
+    // The stored states already have currentWords computed; trust them.
+    void wordSet;
     return data.history;
   } catch {
     return null;
@@ -31,18 +36,18 @@ function loadSaved(puzzleId: number): GameState[] | null {
 
 function saveToDisk(puzzleId: number, history: GameState[]): void {
   try {
-    const data: SavedData = { date: todayStr(), puzzleId, history };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ date: todayStr(), puzzleId, history }));
   } catch {
-    // ignore storage errors
+    // ignore
   }
 }
 
 export function App() {
   const { puzzle, index: puzzleIndex } = getDailyPuzzle();
+  const wordSet = useMemo(() => new Set(wordList), []);
 
   const [history, setHistory] = useState<GameState[]>(() => {
-    return loadSaved(puzzle.id) ?? [initialState(puzzle)];
+    return loadSaved(puzzle.id, wordSet) ?? [initialState(puzzle, wordSet)];
   });
 
   const current = history[history.length - 1]!;
@@ -53,11 +58,11 @@ export function App() {
 
   const applyMove = useCallback(
     (dir: Direction) => {
-      const next = move(current, dir);
+      const next = move(current, dir, wordSet, puzzle.answer);
       if (!next) return;
       setHistory((h) => [...h.slice(-(MAX_HISTORY - 1)), next]);
     },
-    [current],
+    [current, wordSet, puzzle.answer],
   );
 
   const undo = useCallback(() => {
@@ -65,8 +70,8 @@ export function App() {
   }, []);
 
   const restart = useCallback(() => {
-    setHistory([initialState(puzzle)]);
-  }, [puzzle]);
+    setHistory([initialState(puzzle, wordSet)]);
+  }, [puzzle, wordSet]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -105,36 +110,41 @@ export function App() {
     return () => window.removeEventListener('keydown', onKey);
   }, [applyMove, undo, restart]);
 
-  // Build word progress: show locked letters, blank for the rest
-  const wordProgress = Array.from({ length: current.totalTargets }, (_, i) => {
-    for (let y = 0; y < current.grid.length; y++) {
-      for (let x = 0; x < (current.grid[y]?.length ?? 0); x++) {
-        const cell = current.grid[y]?.[x];
-        if (cell?.locked && cell.target?.index === i) return cell.letter!;
-      }
-    }
-    return null;
-  });
+  // Words found on the grid right now, excluding the answer (don't spoil it)
+  const visibleFoundWords = current.allFoundWords
+    .filter((w) => w !== puzzle.answer)
+    .sort((a, b) => b.length - a.length || a.localeCompare(b));
 
   return (
     <div className="app">
       <header className="app-header">
         <h1 className="app-title">Sokoword #{puzzleIndex + 1}</h1>
-        <div className="word-progress">
-          {wordProgress.map((letter, i) => (
-            <span key={i} className={`word-slot ${letter ? 'word-slot--locked' : ''}`}>
-              {letter ?? '_'}
+        <div className="app-meta">
+          <span className="moves">Moves: {current.moves}</span>
+          {current.allFoundWords.length > 0 && (
+            <span className="found-count">
+              {current.allFoundWords.length} word{current.allFoundWords.length !== 1 ? 's' : ''}{' '}
+              found
             </span>
-          ))}
+          )}
         </div>
       </header>
 
       <main className="app-main">
-        <Grid state={current} />
+        <Grid state={current} targetWord={puzzle.answer} />
       </main>
 
+      {visibleFoundWords.length > 0 && (
+        <section className="found-words">
+          {visibleFoundWords.map((w) => (
+            <span key={w} className="found-word">
+              {w.toLowerCase()}
+            </span>
+          ))}
+        </section>
+      )}
+
       <footer className="app-footer">
-        <span className="moves">Moves: {current.moves}</span>
         <span className="controls">↑↓←→ move · U undo · R restart</span>
       </footer>
 
@@ -143,13 +153,13 @@ export function App() {
           <div className="win-card">
             <div className="win-emoji">🎉</div>
             <h2 className="win-title">You found it!</h2>
-            <p className="win-word">{puzzle.answer}</p>
+            <p className="win-word">{puzzle.answer.toLowerCase()}</p>
             <p className="win-moves">Solved in {current.moves} moves</p>
-            <p className="win-share">
-              🔠 Sokoword #{puzzleIndex + 1}
-              <br />
-              {puzzle.answer} in {current.moves} moves
-            </p>
+            {visibleFoundWords.length > 0 && (
+              <p className="win-bonus">
+                +{visibleFoundWords.length} bonus word{visibleFoundWords.length !== 1 ? 's' : ''}
+              </p>
+            )}
             <button className="win-restart" onClick={restart}>
               Play again
             </button>

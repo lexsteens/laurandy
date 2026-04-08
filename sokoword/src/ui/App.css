@@ -20,57 +20,47 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
-  padding: 24px;
+  gap: 14px;
+  padding: 16px;
   width: 100%;
-  max-width: 640px;
+  max-width: 900px;
 }
 
 /* ── Header ─────────────────────────────────────────────────────────────── */
 
 .app-header {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
   width: 100%;
+  max-width: 830px;
 }
 
 .app-title {
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   color: #a0a8c0;
 }
 
-.word-progress {
+.app-meta {
   display: flex;
-  gap: 8px;
-}
-
-.word-slot {
-  display: flex;
+  gap: 20px;
   align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border: 2px solid #3a3a5a;
-  border-radius: 6px;
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: #6060a0;
-  background: #12121e;
-  letter-spacing: 0;
-  transition:
-    background 0.2s,
-    color 0.2s,
-    border-color 0.2s;
 }
 
-.word-slot--locked {
-  background: #16532a;
-  border-color: #22c55e;
-  color: #4ade80;
+.moves {
+  font-size: 0.9rem;
+  color: #8080a8;
+}
+
+.found-count {
+  font-size: 0.85rem;
+  color: #5080a8;
+  background: #12122a;
+  padding: 3px 10px;
+  border-radius: 12px;
+  border: 1px solid #2a2a5a;
 }
 
 /* ── Main grid area ──────────────────────────────────────────────────────── */
@@ -81,20 +71,32 @@ body {
   justify-content: center;
 }
 
+/* ── Found words strip ───────────────────────────────────────────────────── */
+
+.found-words {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  max-width: 830px;
+  width: 100%;
+}
+
+.found-word {
+  font-size: 0.8rem;
+  color: #80b8f0;
+  background: #0f1a2e;
+  border: 1px solid #1e3a5f;
+  border-radius: 4px;
+  padding: 3px 8px;
+  letter-spacing: 0.08em;
+}
+
 /* ── Footer ─────────────────────────────────────────────────────────────── */
 
 .app-footer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.85rem;
-  color: #505070;
-}
-
-.moves {
-  font-size: 1rem;
-  color: #8080a8;
+  font-size: 0.8rem;
+  color: #404060;
 }
 
 /* ── Win overlay ─────────────────────────────────────────────────────────── */
@@ -117,7 +119,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
   max-width: 360px;
   width: 90%;
 }
@@ -127,30 +129,25 @@ body {
 }
 
 .win-title {
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   color: #e8e8f0;
 }
 
 .win-word {
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 700;
   color: #4ade80;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.25em;
 }
 
 .win-moves {
   color: #8080a8;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
-.win-share {
-  background: #1a1a2e;
-  border-radius: 8px;
-  padding: 12px 20px;
-  font-size: 0.9rem;
-  color: #a0a8c0;
-  line-height: 1.6;
-  text-align: center;
+.win-bonus {
+  color: #60a0f8;
+  font-size: 0.85rem;
 }
 
 .win-restart {

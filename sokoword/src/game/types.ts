@@ -1,16 +1,9 @@
 export type CellType = 'wall' | 'floor';
 
-export interface Target {
-  index: number; // 0-based position in the answer word
-  letter: string; // correct letter for this target (not shown to player)
-}
-
 export interface Cell {
   type: CellType;
   hasPlayer: boolean;
-  letter: string | null; // letter tile currently on this cell (null if empty)
-  target: Target | null; // non-null if this is a target square
-  locked: boolean; // true when the correct letter is locked here
+  letter: string | null;
 }
 
 export type Grid = Cell[][];
@@ -20,19 +13,25 @@ export interface Pos {
   y: number;
 }
 
+export interface WordMatch {
+  word: string; // uppercase letters as on grid
+  startPos: Pos;
+  direction: 'h' | 'v';
+}
+
 export interface GameState {
   grid: Grid;
   playerPos: Pos;
-  lockedCount: number;
-  totalTargets: number;
   moves: number;
   status: 'playing' | 'won';
+  currentWords: WordMatch[]; // words currently formed on the grid
+  allFoundWords: string[]; // all unique words seen since game start (uppercase)
 }
 
 export type Direction = 'up' | 'down' | 'left' | 'right';
 
 export interface Puzzle {
   id: number;
-  answer: string;
+  answer: string; // uppercase — hidden from player until won
   grid: string[];
 }
