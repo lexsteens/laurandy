@@ -3,12 +3,14 @@ import type { Cell, Direction, GameState, Grid, Pos, Puzzle, WordMatch } from '.
 const LETTER_RE = /^[A-Z]$/;
 
 export function parseGrid(puzzle: Puzzle): Grid {
-  return puzzle.grid.map((row) =>
-    row.split('').map((char) => {
+  return puzzle.grid.map((row, y) =>
+    row.split('').map((char, x) => {
+      const isLetter = LETTER_RE.test(char);
       const cell: Cell = {
         type: char === '#' ? 'wall' : 'floor',
         hasPlayer: char === '@',
-        letter: LETTER_RE.test(char) ? char : null,
+        letter: isLetter ? char : null,
+        wordIndex: isLetter ? (puzzle.letterSources[`${x},${y}`] ?? null) : null,
       };
       return cell;
     }),
@@ -120,7 +122,7 @@ export function move(
   state: GameState,
   direction: Direction,
   wordSet: Set<string>,
-  answer: string,
+  words: string[],
 ): GameState | null {
   if (state.status === 'won') return null;
 
@@ -143,10 +145,13 @@ export function move(
     if (!beyond || beyond.type === 'wall' || beyond.letter !== null) return null;
 
     const movingLetter = next.letter;
+    const movingWordIndex = next.wordIndex;
     newGrid[y]![x]!.hasPlayer = false;
     newGrid[ny]![nx]!.letter = null;
+    newGrid[ny]![nx]!.wordIndex = null;
     newGrid[ny]![nx]!.hasPlayer = true;
     newGrid[by]![bx]!.letter = movingLetter;
+    newGrid[by]![bx]!.wordIndex = movingWordIndex;
   } else {
     // Normal move onto empty floor
     newGrid[y]![x]!.hasPlayer = false;
@@ -154,7 +159,8 @@ export function move(
   }
 
   const currentWords = scanWords(newGrid, wordSet);
-  const won = currentWords.some((w) => w.word === answer);
+  const foundSet = new Set(currentWords.map((w) => w.word));
+  const won = words.every((w) => foundSet.has(w));
 
   return {
     grid: newGrid,

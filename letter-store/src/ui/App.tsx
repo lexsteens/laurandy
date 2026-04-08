@@ -61,6 +61,8 @@ export function App() {
 
   const [seed, setSeed] = useState<number>(saved?.seed ?? randomSeed());
   const [levelId, setLevelId] = useState<number>(saved?.levelId ?? levels[0]!.id);
+  const [showHints, setShowHints] = useState(false);
+  const [colorWords, setColorWords] = useState(false);
 
   const puzzle = useMemo(() => makePuzzle(levelId, seed), [levelId, seed]);
   const level = useMemo(() => levels.find((l) => l.id === levelId) ?? levels[0]!, [levelId]);
@@ -95,7 +97,7 @@ export function App() {
 
   const applyMove = useCallback(
     (dir: Direction) => {
-      const next = move(current, dir, wordSet, puzzle.answer);
+      const next = move(current, dir, wordSet, puzzle.words);
       if (!next) return;
       setHistory((h) => [...h.slice(-(MAX_HISTORY - 1)), next]);
     },
@@ -144,14 +146,11 @@ export function App() {
     return <HomeScreen levels={levels} initialSeed={proposedSeed} onStart={startGame} />;
   }
 
-  // Only show words currently on the grid, excluding the answer word
-  const visibleWords = current.currentWords
-    .filter((m) => m.word !== puzzle.answer)
-    .sort((a, b) => scoreWord(b.word) - scoreWord(a.word) || b.word.length - a.word.length);
+  const visibleWords = current.currentWords.sort(
+    (a, b) => scoreWord(b.word) - scoreWord(a.word) || b.word.length - a.word.length,
+  );
 
-  const totalScore = current.currentWords
-    .filter((m) => m.word !== puzzle.answer)
-    .reduce((sum, m) => sum + scoreWord(m.word), 0);
+  const totalScore = current.currentWords.reduce((sum, m) => sum + scoreWord(m.word), 0);
 
   return (
     <div className="app">
@@ -169,7 +168,7 @@ export function App() {
       </header>
 
       <main className="app-main">
-        <Grid state={current} targetWord={puzzle.answer} />
+        <Grid state={current} />
       </main>
 
       {visibleWords.length > 0 && (
@@ -183,24 +182,61 @@ export function App() {
         </section>
       )}
 
+      {showHints && (
+        <section className="hints-strip">
+          {puzzle.words.map((word, i) => (
+            <span key={i} className="hint-word">
+              <span className="hint-first">{word[0]}</span>
+              {'·'.repeat(word.length - 1)}
+            </span>
+          ))}
+        </section>
+      )}
+
+      {colorWords && (
+        <section className="cheat-strip">
+          {puzzle.words.map((word, i) => (
+            <span key={i} className="cheat-word">
+              {word.toLowerCase()}
+            </span>
+          ))}
+        </section>
+      )}
+
       <footer className="app-footer">
         <span className="controls">↑↓←→ move · U undo · seed {seed}</span>
+        <div className="app-toggles">
+          <button
+            className={`app-toggle${showHints ? ' app-toggle--on' : ''}`}
+            onClick={() => setShowHints((v) => !v)}
+            title="Show first letter of each word"
+          >
+            hints
+          </button>
+          <button
+            className={`app-toggle${colorWords ? ' app-toggle--on' : ''}`}
+            onClick={() => setColorWords((v) => !v)}
+            title="Cheat: reveal planted word letters"
+          >
+            cheat
+          </button>
+        </div>
       </footer>
 
       {current.status === 'won' && (
         <div className="win-overlay">
           <div className="win-card">
             <div className="win-emoji">🎉</div>
-            <h2 className="win-title">You found it!</h2>
-            <p className="win-word">{puzzle.answer.toLowerCase()}</p>
-            <p className="win-score">{scoreWord(puzzle.answer)} pts</p>
+            <h2 className="win-title">All words found!</h2>
+            <div className="win-words">
+              {puzzle.words.map((w) => (
+                <span key={w} className="win-word">
+                  {w.toLowerCase()}
+                </span>
+              ))}
+            </div>
+            <p className="win-score">{totalScore} pts</p>
             <p className="win-moves">Solved in {current.moves} moves</p>
-            {visibleWords.length > 0 && (
-              <p className="win-bonus">
-                +{totalScore} bonus pts from {visibleWords.length} word
-                {visibleWords.length !== 1 ? 's' : ''}
-              </p>
-            )}
             <button className="win-restart" onClick={goHome}>
               Back to home
             </button>

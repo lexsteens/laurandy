@@ -251,11 +251,97 @@ body {
   font-weight: 700;
 }
 
+/* ── Hints strip ─────────────────────────────────────────────────────────── */
+
+.hints-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  max-width: 830px;
+  width: 100%;
+}
+
+.hint-word {
+  font-size: 0.85rem;
+  color: #5060a0;
+  background: #0e0e1c;
+  border: 1px solid #2a2a4a;
+  border-radius: 4px;
+  padding: 3px 10px;
+  letter-spacing: 0.2em;
+}
+
+.hint-first {
+  color: #9090d0;
+  font-weight: 700;
+}
+
+/* ── Cheat strip ─────────────────────────────────────────────────────────── */
+
+.cheat-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  max-width: 830px;
+  width: 100%;
+}
+
+.cheat-word {
+  font-size: 0.85rem;
+  color: #a05030;
+  background: #1a100a;
+  border: 1px solid #4a2a10;
+  border-radius: 4px;
+  padding: 3px 10px;
+  letter-spacing: 0.12em;
+}
+
 /* ── Footer ─────────────────────────────────────────────────────────────── */
 
 .app-footer {
   font-size: 0.8rem;
   color: #404060;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 830px;
+  gap: 16px;
+}
+
+.app-toggles {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.app-toggle {
+  background: none;
+  border: 1px solid #2a2a4a;
+  border-radius: 4px;
+  color: #404060;
+  font-family: inherit;
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition:
+    color 0.15s,
+    border-color 0.15s,
+    background 0.15s;
+}
+
+.app-toggle:hover {
+  color: #6070a0;
+  border-color: #3a3a6a;
+}
+
+.app-toggle--on {
+  border-color: #4050a0;
+  color: #8090d0;
+  background: #0e0e24;
 }
 
 /* ── Win overlay ─────────────────────────────────────────────────────────── */
@@ -292,11 +378,22 @@ body {
   color: #e8e8f0;
 }
 
+.win-words {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
 .win-word {
-  font-size: 2.2rem;
+  font-size: 1.2rem;
   font-weight: 700;
-  color: #4ade80;
-  letter-spacing: 0.25em;
+  color: #80c8f8;
+  letter-spacing: 0.15em;
+  background: #0f1a2e;
+  border: 1px solid #1e3a5f;
+  border-radius: 6px;
+  padding: 4px 12px;
 }
 
 .win-score {

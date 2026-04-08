@@ -101,32 +101,54 @@ export function generatePuzzle(level: Level, wordList: string[], seed: number): 
   );
   const decoys = remaining.slice(0, WORD_COUNT - 1);
 
-  const allLetters = [answer, ...decoys.map((w) => w.toUpperCase())].flatMap((w) => w.split(''));
+  const allWords = [answer, ...decoys.map((w) => w.toUpperCase())];
+  const allLetterInfos = allWords.flatMap((w, wi) =>
+    w.split('').map((letter) => ({ letter, wordIndex: wi })),
+  );
 
   const safe = safeFloorPositions(level.grid);
   const wordSetLower = new Set(wordList.map((w) => w.toLowerCase()));
 
   let lastGrid = level.grid;
+  let lastLetterSources: Record<string, number> = {};
 
   for (let attempt = 0; attempt < MAX_SCATTER_ATTEMPTS; attempt++) {
-    const positions = shuffle(safe, rng).slice(0, allLetters.length);
-    const letters = shuffle(allLetters, rng);
-    const placements = positions.map((pos, i) => ({ ...pos, letter: letters[i]! }));
+    const positions = shuffle(safe, rng).slice(0, allLetterInfos.length);
+    const infos = shuffle(allLetterInfos, rng);
+    const placements = positions.map((pos, i) => ({ ...pos, ...infos[i]! }));
+
+    const letterSources: Record<string, number> = {};
+    for (const { x, y, wordIndex } of placements) {
+      letterSources[`${x},${y}`] = wordIndex;
+    }
+
     const grid = placeLetters(level.grid, placements);
     lastGrid = grid;
+    lastLetterSources = letterSources;
 
-    const parsed = parseGrid({ id: level.id, answer, grid });
+    const emptyPuzzle = { id: level.id, answer, words: allWords, letterSources: {}, grid };
+    const parsed = parseGrid(emptyPuzzle);
     const preFormed = new Set(scanWords(parsed, wordSetLower).map((w) => w.word));
-    const anyPreFormed = [answer, ...decoys.map((w) => w.toUpperCase())].some((w) =>
-      preFormed.has(w),
-    );
+    const anyPreFormed = allWords.some((w) => preFormed.has(w));
 
     if (!anyPreFormed) {
-      return { id: level.id * 10000 + (seed % 10000), answer, grid };
+      return {
+        id: level.id * 10000 + (seed % 10000),
+        answer,
+        words: allWords,
+        letterSources,
+        grid,
+      };
     }
   }
 
-  return { id: level.id * 10000 + (seed % 10000), answer, grid: lastGrid };
+  return {
+    id: level.id * 10000 + (seed % 10000),
+    answer,
+    words: allWords,
+    letterSources: lastLetterSources,
+    grid: lastGrid,
+  };
 }
 
 // ── Day index (for display only) ──────────────────────────────────────────────

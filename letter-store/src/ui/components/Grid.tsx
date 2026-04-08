@@ -4,45 +4,36 @@ import './Grid.css';
 
 interface Props {
   state: GameState;
-  targetWord: string;
 }
 
-type CellHighlight = 'target' | 'word' | null;
-
-export function Grid({ state, targetWord }: Props) {
+export function Grid({ state }: Props) {
   const { grid, currentWords } = state;
 
-  // Build a map: "x,y" → highlight type for all cells in currently-formed words
-  const highlightMap = useMemo(() => {
-    const map = new Map<string, CellHighlight>();
+  // Build a set: "x,y" for all cells in currently-formed words
+  const highlightSet = useMemo(() => {
+    const set = new Set<string>();
     for (const match of currentWords) {
-      const isTarget = match.word === targetWord;
       for (let i = 0; i < match.word.length; i++) {
         const cx = match.direction === 'h' ? match.startPos.x + i : match.startPos.x;
         const cy = match.direction === 'v' ? match.startPos.y + i : match.startPos.y;
-        const key = `${cx},${cy}`;
-        // Target highlight wins over regular word highlight
-        if (isTarget || map.get(key) !== 'target') {
-          map.set(key, isTarget ? 'target' : 'word');
-        }
+        set.add(`${cx},${cy}`);
       }
     }
-    return map;
-  }, [currentWords, targetWord]);
+    return set;
+  }, [currentWords]);
 
   return (
     <div className="grid" style={{ '--cols': grid[0]?.length ?? 0 } as React.CSSProperties}>
       {grid.map((row, y) =>
         row.map((cell, x) => {
-          const highlight = highlightMap.get(`${x},${y}`) ?? null;
+          const highlighted = highlightSet.has(`${x},${y}`);
 
           let className = 'cell';
           if (cell.type === 'wall') {
             className += ' cell--wall';
           } else if (cell.letter !== null) {
             className += ' cell--letter';
-            if (highlight === 'target') className += ' cell--target-word';
-            else if (highlight === 'word') className += ' cell--found-word';
+            if (highlighted) className += ' cell--found-word';
           } else {
             className += ' cell--floor';
           }

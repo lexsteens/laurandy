@@ -4,6 +4,7 @@ export interface Cell {
   type: CellType;
   hasPlayer: boolean;
   letter: string | null;
+  wordIndex: number | null; // which planted word this tile belongs to (0 = answer)
 }
 
 export type Grid = Cell[][];
@@ -32,6 +33,8 @@ export type Direction = 'up' | 'down' | 'left' | 'right';
 export interface Puzzle {
   id: number;
   answer: string; // uppercase — hidden from player until won
+  words: string[]; // all planted words uppercase (answer is words[0])
+  letterSources: Record<string, number>; // "x,y" → wordIndex for initial tile placement
   grid: string[];
 }
 

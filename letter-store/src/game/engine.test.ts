@@ -21,6 +21,8 @@ import type { Puzzle } from './types';
 const testPuzzle: Puzzle = {
   id: 0,
   answer: 'CAT',
+  words: ['CAT'],
+  letterSources: {},
   grid: [
     '########',
     '#@.....#',
@@ -137,21 +139,21 @@ describe('scanWords', () => {
 describe('move', () => {
   it('moves player onto empty floor', () => {
     const s = initialState(testPuzzle, wordSet);
-    const next = move(s, 'right', wordSet, testPuzzle.answer);
+    const next = move(s, 'right', wordSet, testPuzzle.words);
     expect(next?.playerPos).toEqual({ x: 2, y: 1 });
     expect(next?.moves).toBe(1);
   });
 
   it('returns null when moving into wall', () => {
     const s = initialState(testPuzzle, wordSet);
-    expect(move(s, 'left', wordSet, testPuzzle.answer)).toBeNull();
-    expect(move(s, 'up', wordSet, testPuzzle.answer)).toBeNull();
+    expect(move(s, 'left', wordSet, testPuzzle.words)).toBeNull();
+    expect(move(s, 'up', wordSet, testPuzzle.words)).toBeNull();
   });
 
   it('pushes a letter tile', () => {
     const s = initialState(testPuzzle, wordSet);
     // Player at (1,1), C at (1,2) — push down
-    const next = move(s, 'down', wordSet, testPuzzle.answer);
+    const next = move(s, 'down', wordSet, testPuzzle.words);
     expect(next?.playerPos).toEqual({ x: 1, y: 2 });
     expect(next?.grid[3]?.[1]?.letter).toBe('C');
     expect(next?.grid[2]?.[1]?.letter).toBeNull();
@@ -160,9 +162,9 @@ describe('move', () => {
   it('returns null when pushing letter into wall', () => {
     const s = initialState(testPuzzle, wordSet);
     // Player needs to be at (2,2) to push C left into wall at (0,2)
-    const s1 = move(s, 'right', wordSet, testPuzzle.answer)!; // player→(2,1)
-    const s2 = move(s1, 'down', wordSet, testPuzzle.answer)!; // player→(2,2)
-    const result = move(s2, 'left', wordSet, testPuzzle.answer); // push C into wall
+    const s1 = move(s, 'right', wordSet, testPuzzle.words)!; // player→(2,1)
+    const s2 = move(s1, 'down', wordSet, testPuzzle.words)!; // player→(2,2)
+    const result = move(s2, 'left', wordSet, testPuzzle.words); // push C into wall
     expect(result).toBeNull();
   });
 
@@ -174,11 +176,11 @@ describe('move', () => {
     // move down → p(2,4) — now player is right of C(1,4)
     // push left: C(1,4) would go to (0,4) = wall → blocked
     const s = initialState(testPuzzle, wordSet);
-    const s1 = move(s, 'down', wordSet, testPuzzle.answer)!; // C→(1,3), p→(1,2)
-    const s2 = move(s1, 'down', wordSet, testPuzzle.answer)!; // C→(1,4), p→(1,3)
-    const s3 = move(s2, 'right', wordSet, testPuzzle.answer)!; // p→(2,3)
-    const s4 = move(s3, 'down', wordSet, testPuzzle.answer)!; // p→(2,4)
-    const blocked = move(s4, 'left', wordSet, testPuzzle.answer); // C(1,4)→(0,4)=wall
+    const s1 = move(s, 'down', wordSet, testPuzzle.words)!; // C→(1,3), p→(1,2)
+    const s2 = move(s1, 'down', wordSet, testPuzzle.words)!; // C→(1,4), p→(1,3)
+    const s3 = move(s2, 'right', wordSet, testPuzzle.words)!; // p→(2,3)
+    const s4 = move(s3, 'down', wordSet, testPuzzle.words)!; // p→(2,4)
+    const blocked = move(s4, 'left', wordSet, testPuzzle.words); // C(1,4)→(0,4)=wall
     expect(blocked).toBeNull();
   });
 
@@ -203,15 +205,15 @@ describe('move', () => {
       grid: g,
       playerPos: { x: 6, y: 4 },
     };
-    const result = move(arranged, 'left', wordSet, testPuzzle.answer);
+    const result = move(arranged, 'left', wordSet, testPuzzle.words);
     expect(result?.status).toBe('won');
     expect(result?.currentWords.some((w) => w.word === 'CAT')).toBe(true);
   });
 
   it('currentWords is empty when no words are formed', () => {
     const s = initialState(testPuzzle, wordSet);
-    const s1 = move(s, 'down', wordSet, testPuzzle.answer)!; // C→(1,3), p→(1,2)
-    const s2 = move(s1, 'down', wordSet, testPuzzle.answer)!; // C→(1,4)
+    const s1 = move(s, 'down', wordSet, testPuzzle.words)!; // C→(1,3), p→(1,2)
+    const s2 = move(s1, 'down', wordSet, testPuzzle.words)!; // C→(1,4)
     expect(s2.currentWords).toHaveLength(0);
   });
 });
