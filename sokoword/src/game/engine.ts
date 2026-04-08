@@ -93,7 +93,6 @@ export function initialState(puzzle: Puzzle, wordSet: Set<string>): GameState {
   }
 
   const currentWords = scanWords(grid, wordSet);
-  const allFoundWords = [...new Set(currentWords.map((w) => w.word))];
 
   return {
     grid,
@@ -101,7 +100,6 @@ export function initialState(puzzle: Puzzle, wordSet: Set<string>): GameState {
     moves: 0,
     status: 'playing',
     currentWords,
-    allFoundWords,
   };
 }
 
@@ -156,9 +154,7 @@ export function move(
   }
 
   const currentWords = scanWords(newGrid, wordSet);
-  const newWordStrings = new Set(currentWords.map((w) => w.word));
-  const allFoundWords = [...new Set([...state.allFoundWords, ...newWordStrings])];
-  const won = newWordStrings.has(answer);
+  const won = currentWords.some((w) => w.word === answer);
 
   return {
     grid: newGrid,
@@ -166,6 +162,5 @@ export function move(
     moves: state.moves + 1,
     status: won ? 'won' : 'playing',
     currentWords,
-    allFoundWords,
   };
 }

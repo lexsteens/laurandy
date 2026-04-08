@@ -25,7 +25,6 @@ export interface GameState {
   moves: number;
   status: 'playing' | 'won';
   currentWords: WordMatch[]; // words currently formed on the grid
-  allFoundWords: string[]; // all unique words seen since game start (uppercase)
 }
 
 export type Direction = 'up' | 'down' | 'left' | 'right';
@@ -33,5 +32,13 @@ export type Direction = 'up' | 'down' | 'left' | 'right';
 export interface Puzzle {
   id: number;
   answer: string; // uppercase — hidden from player until won
+  grid: string[];
+}
+
+// A level is a grid template: only walls (#), floor (.), and player start (@).
+// No letters — they are placed at runtime by the level generator.
+export interface Level {
+  id: number;
+  name: string;
   grid: string[];
 }

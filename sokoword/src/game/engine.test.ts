@@ -208,13 +208,10 @@ describe('move', () => {
     expect(result?.currentWords.some((w) => w.word === 'CAT')).toBe(true);
   });
 
-  it('accumulates found words across moves', () => {
+  it('currentWords is empty when no words are formed', () => {
     const s = initialState(testPuzzle, wordSet);
-    // Push C to (1,3): player at (1,2) pushes down
     const s1 = move(s, 'down', wordSet, testPuzzle.answer)!; // C→(1,3), p→(1,2)
-    // Push C to (1,4): player at (1,3) pushes down
     const s2 = move(s1, 'down', wordSet, testPuzzle.answer)!; // C→(1,4)
-    // Moves don't form words yet but allFoundWords should stay empty (no words formed)
-    expect(s2.allFoundWords).toHaveLength(0);
+    expect(s2.currentWords).toHaveLength(0);
   });
 });

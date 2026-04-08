@@ -36,11 +36,23 @@ body {
   max-width: 830px;
 }
 
+.app-title-group {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
 .app-title {
   font-size: 1.3rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   color: #a0a8c0;
+}
+
+.app-level-name {
+  font-size: 0.8rem;
+  color: #505070;
+  letter-spacing: 0.05em;
 }
 
 .app-meta {
@@ -83,6 +95,9 @@ body {
 }
 
 .found-word {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   font-size: 0.8rem;
   color: #80b8f0;
   background: #0f1a2e;
@@ -90,6 +105,12 @@ body {
   border-radius: 4px;
   padding: 3px 8px;
   letter-spacing: 0.08em;
+}
+
+.found-word-score {
+  font-size: 0.7rem;
+  color: #4a7aaa;
+  font-weight: 700;
 }
 
 /* ── Footer ─────────────────────────────────────────────────────────────── */
@@ -138,6 +159,13 @@ body {
   font-weight: 700;
   color: #4ade80;
   letter-spacing: 0.25em;
+}
+
+.win-score {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fbbf24;
+  letter-spacing: 0.1em;
 }
 
 .win-moves {
