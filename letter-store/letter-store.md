@@ -1,4 +1,4 @@
-# CLAUDE.md — Sokoword (Web Prototype)
+# CLAUDE.md — Letter Store (Web Prototype)
 
 ## Purpose
 
@@ -16,7 +16,7 @@ This means:
 
 ## Concept
 
-Sokoword is a Sokoban-inspired daily puzzle game. Letter tiles are scattered on a grid. The player moves a character around the grid, pushing letters into target squares to spell a hidden word. Like Sokoban, letters can only be pushed — never pulled — and a misplaced letter can make the puzzle unsolvable, requiring a restart.
+Letter Store is a Sokoban-inspired daily puzzle game. Letter tiles are scattered on a grid. The player moves a character around the grid, pushing letters into target squares to spell a hidden word. Like Sokoban, letters can only be pushed — never pulled — and a misplaced letter can make the puzzle unsolvable, requiring a restart.
 
 The target word is known from the start (shown above the grid). The challenge is purely spatial: figuring out how to maneuver the letters into position without creating deadlocks.
 
@@ -331,7 +331,7 @@ export function getDailyPuzzle(puzzles) {
 
 ```
 ┌─────────────────────────┐
-│  Sokoword #42           │
+│  Letter Store #42           │
 │  Spell: R A I N         │
 │  [R][ ][ ][ ] ← fills in│
 ├─────────────────────────┤
@@ -372,7 +372,7 @@ localStorage.setItem(
 ## Share Card (on win)
 
 ```
-🔠 Sokoword #42
+🔠 Letter Store #42
 RAIN in 34 moves
 sokoword.game
 ```

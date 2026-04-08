@@ -26,6 +26,131 @@ body {
   max-width: 900px;
 }
 
+/* ── Home screen ─────────────────────────────────────────────────────────── */
+
+.home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  padding: 48px 24px;
+  width: 100%;
+  max-width: 520px;
+}
+
+.home-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.home-title {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: #a0a8c0;
+}
+
+.home-tagline {
+  font-size: 0.85rem;
+  color: #505070;
+  letter-spacing: 0.08em;
+}
+
+.home-seed-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.home-seed-label {
+  font-size: 0.85rem;
+  color: #6060a0;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.home-seed-input {
+  background: #12121e;
+  border: 1px solid #2a2a5a;
+  border-radius: 6px;
+  color: #c0c8e0;
+  font-family: inherit;
+  font-size: 0.9rem;
+  padding: 6px 12px;
+  width: 160px;
+  text-align: right;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.home-seed-input:focus {
+  border-color: #5060a0;
+}
+
+.home-seed-input--invalid {
+  border-color: #7a3030;
+  color: #a05050;
+}
+
+/* Remove number input spinners */
+.home-seed-input::-webkit-inner-spin-button,
+.home-seed-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+.home-seed-input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+.home-levels {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.home-level-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: #0e0e1c;
+  border: 1px solid #2a2a4a;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+  font-family: inherit;
+  text-align: left;
+  width: 100%;
+}
+
+.home-level-card:hover:not(:disabled) {
+  background: #14142a;
+  border-color: #4050a0;
+}
+
+.home-level-card:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.home-level-number {
+  font-size: 0.75rem;
+  color: #404068;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  min-width: 56px;
+}
+
+.home-level-name {
+  font-size: 1rem;
+  color: #9090c0;
+  letter-spacing: 0.06em;
+}
+
 /* ── Header ─────────────────────────────────────────────────────────────── */
 
 .app-header {
@@ -38,15 +163,28 @@ body {
 
 .app-title-group {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 12px;
 }
 
-.app-title {
-  font-size: 1.3rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: #a0a8c0;
+.app-home-btn {
+  background: none;
+  border: 1px solid #2a2a4a;
+  border-radius: 6px;
+  color: #5060a0;
+  font-size: 1rem;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-family: inherit;
+  line-height: 1;
+  transition:
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.app-home-btn:hover {
+  color: #8090c8;
+  border-color: #4050a0;
 }
 
 .app-level-name {

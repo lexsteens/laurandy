@@ -1,4 +1,4 @@
-# CLAUDE.md — Sokoword (Web Prototype)
+# CLAUDE.md — Letter Store (Web Prototype)
 
 ## Purpose
 
@@ -177,7 +177,7 @@ Seed + history are restored on page reload. `R` generates a new random seed and 
 - **Found word (not answer)**: blue glow
 - **Answer word formed**: pulsing green glow → win screen
 - **Found words strip**: shown below grid (answer excluded until won)
-- **Header**: `Sokoword` + level name (dim) + move counter
+- **Header**: `Letter Store` + level name (dim) + move counter
 
 ---
 

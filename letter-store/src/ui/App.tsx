@@ -1,14 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { initialState, move } from '../game/engine';
-import { generatePuzzle, getDayIndex, randomSeed } from '../game/level-generator';
+import { generatePuzzle, randomSeed } from '../game/level-generator';
 import { levels } from '../game/levels/index';
 import { scoreWord } from '../game/scoring';
 import type { Direction, GameState, Puzzle } from '../game/types';
 import { wordList } from '../game/word-list';
 import { Grid } from './components/Grid';
+import { HomeScreen } from './components/HomeScreen';
 
-const STORAGE_KEY = 'sokoword-v4';
+const STORAGE_KEY = 'letter-store-v4';
 const MAX_HISTORY = 100;
+
+type Screen = 'home' | 'game';
 
 interface SavedData {
   seed: number;
@@ -49,27 +52,46 @@ function makePuzzle(levelId: number, seed: number): Puzzle {
 
 export function App() {
   const wordSet = useMemo(() => new Set(wordList), []);
-  const dayIndex = useMemo(() => getDayIndex(), []);
 
-  const [seed, setSeed] = useState<number>(() => loadSaved()?.seed ?? randomSeed());
-  const [levelId, setLevelId] = useState<number>(
-    () => loadSaved()?.levelId ?? levels[dayIndex % levels.length]!.id,
-  );
+  // Restore saved game on mount, otherwise start at home
+  const saved = useMemo(() => loadSaved(), []);
+
+  const [screen, setScreen] = useState<Screen>(saved ? 'game' : 'home');
+  const [proposedSeed, setProposedSeed] = useState<number>(saved?.seed ?? randomSeed());
+
+  const [seed, setSeed] = useState<number>(saved?.seed ?? randomSeed());
+  const [levelId, setLevelId] = useState<number>(saved?.levelId ?? levels[0]!.id);
 
   const puzzle = useMemo(() => makePuzzle(levelId, seed), [levelId, seed]);
   const level = useMemo(() => levels.find((l) => l.id === levelId) ?? levels[0]!, [levelId]);
 
   const [history, setHistory] = useState<GameState[]>(() => {
-    const saved = loadSaved();
-    if (saved && saved.seed === seed && saved.levelId === levelId) return saved.history;
-    return [initialState(puzzle, wordSet)];
+    if (saved) return saved.history;
+    return [initialState(makePuzzle(levels[0]!.id, seed), wordSet)];
   });
 
   const current = history[history.length - 1]!;
 
   useEffect(() => {
-    saveToDisk(seed, levelId, history);
-  }, [seed, levelId, history]);
+    if (screen === 'game') saveToDisk(seed, levelId, history);
+  }, [screen, seed, levelId, history]);
+
+  const startGame = useCallback(
+    (newLevelId: number, newSeed: number) => {
+      const newPuzzle = makePuzzle(newLevelId, newSeed);
+      setSeed(newSeed);
+      setLevelId(newLevelId);
+      setHistory([initialState(newPuzzle, wordSet)]);
+      setScreen('game');
+    },
+    [wordSet],
+  );
+
+  const goHome = useCallback(() => {
+    setScreen('home');
+    setProposedSeed(randomSeed());
+    localStorage.removeItem(STORAGE_KEY);
+  }, []);
 
   const applyMove = useCallback(
     (dir: Direction) => {
@@ -84,16 +106,9 @@ export function App() {
     setHistory((h) => (h.length > 1 ? h.slice(0, -1) : h));
   }, []);
 
-  const restart = useCallback(() => {
-    const newSeed = randomSeed();
-    const newLevelId = levels[dayIndex % levels.length]!.id;
-    const newPuzzle = makePuzzle(newLevelId, newSeed);
-    setSeed(newSeed);
-    setLevelId(newLevelId);
-    setHistory([initialState(newPuzzle, wordSet)]);
-  }, [dayIndex, wordSet]);
-
   useEffect(() => {
+    if (screen !== 'game') return;
+
     function onKey(e: KeyboardEvent) {
       switch (e.key) {
         case 'ArrowUp':
@@ -116,10 +131,6 @@ export function App() {
         case 'U':
           undo();
           break;
-        case 'r':
-        case 'R':
-          restart();
-          break;
         default:
           return;
       }
@@ -127,7 +138,11 @@ export function App() {
     }
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [applyMove, undo, restart]);
+  }, [screen, applyMove, undo]);
+
+  if (screen === 'home') {
+    return <HomeScreen levels={levels} initialSeed={proposedSeed} onStart={startGame} />;
+  }
 
   // Only show words currently on the grid, excluding the answer word
   const visibleWords = current.currentWords
@@ -142,7 +157,9 @@ export function App() {
     <div className="app">
       <header className="app-header">
         <div className="app-title-group">
-          <h1 className="app-title">Sokoword</h1>
+          <button className="app-home-btn" onClick={goHome} title="Back to home">
+            ⌂
+          </button>
           <span className="app-level-name">{level.name}</span>
         </div>
         <div className="app-meta">
@@ -167,7 +184,7 @@ export function App() {
       )}
 
       <footer className="app-footer">
-        <span className="controls">↑↓←→ move · U undo · R new puzzle</span>
+        <span className="controls">↑↓←→ move · U undo · seed {seed}</span>
       </footer>
 
       {current.status === 'won' && (
@@ -184,8 +201,8 @@ export function App() {
                 {visibleWords.length !== 1 ? 's' : ''}
               </p>
             )}
-            <button className="win-restart" onClick={restart}>
-              Next puzzle
+            <button className="win-restart" onClick={goHome}>
+              Back to home
             </button>
           </div>
         </div>
