@@ -1,0 +1,171 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #0a0a0f;
+  color: #e8e8f0;
+  font-family: 'Courier New', Courier, monospace;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 24px;
+  width: 100%;
+  max-width: 640px;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+
+.app-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.app-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #a0a8c0;
+}
+
+.word-progress {
+  display: flex;
+  gap: 8px;
+}
+
+.word-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 2px solid #3a3a5a;
+  border-radius: 6px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #6060a0;
+  background: #12121e;
+  letter-spacing: 0;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    border-color 0.2s;
+}
+
+.word-slot--locked {
+  background: #16532a;
+  border-color: #22c55e;
+  color: #4ade80;
+}
+
+/* ── Main grid area ──────────────────────────────────────────────────────── */
+
+.app-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Footer ─────────────────────────────────────────────────────────────── */
+
+.app-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: #505070;
+}
+
+.moves {
+  font-size: 1rem;
+  color: #8080a8;
+}
+
+/* ── Win overlay ─────────────────────────────────────────────────────────── */
+
+.win-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.win-card {
+  background: #12121e;
+  border: 1px solid #3a3a5a;
+  border-radius: 12px;
+  padding: 40px 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  max-width: 360px;
+  width: 90%;
+}
+
+.win-emoji {
+  font-size: 3rem;
+}
+
+.win-title {
+  font-size: 1.6rem;
+  color: #e8e8f0;
+}
+
+.win-word {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #4ade80;
+  letter-spacing: 0.2em;
+}
+
+.win-moves {
+  color: #8080a8;
+  font-size: 0.95rem;
+}
+
+.win-share {
+  background: #1a1a2e;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 0.9rem;
+  color: #a0a8c0;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.win-restart {
+  margin-top: 8px;
+  padding: 10px 28px;
+  background: #1e3a5f;
+  border: 1px solid #4080c0;
+  border-radius: 8px;
+  color: #80b8f0;
+  font-family: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.win-restart:hover {
+  background: #264a77;
+}

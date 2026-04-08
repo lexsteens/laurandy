@@ -1,0 +1,96 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 52px);
+  grid-template-rows: auto;
+  gap: 2px;
+  background: #050508;
+  padding: 2px;
+  border-radius: 4px;
+}
+
+/* ── Base cell ───────────────────────────────────────────────────────────── */
+
+.cell {
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  font-family: 'Courier New', Courier, monospace;
+  user-select: none;
+}
+
+/* ── Wall ────────────────────────────────────────────────────────────────── */
+
+.cell--wall {
+  background: #2a2a3a;
+}
+
+/* ── Empty floor ─────────────────────────────────────────────────────────── */
+
+.cell--floor {
+  background: #1a1a2e;
+}
+
+/* ── Target square (no letter on it) ─────────────────────────────────────── */
+
+.cell--target {
+  background: #1a1a3a;
+  border: 2px dashed #3a4080;
+}
+
+.target-index {
+  color: #5060a0;
+  font-size: 0.9rem;
+}
+
+/* ── Letter tile ─────────────────────────────────────────────────────────── */
+
+.cell--letter {
+  background: #e8e8f0;
+  box-shadow:
+    0 2px 0 #8888a8,
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.cell--letter .letter-char {
+  color: #1a1a2e;
+  font-size: 1.3rem;
+}
+
+/* ── Wrong letter sitting on a target ───────────────────────────────────── */
+
+.cell--wrong-on-target {
+  background: #3a2800;
+  border: 2px solid #b45309;
+  box-shadow: 0 0 8px rgba(180, 83, 9, 0.4);
+}
+
+.cell--wrong-on-target .letter-char {
+  color: #fbbf24;
+  font-size: 1.3rem;
+}
+
+/* ── Locked tile (correct letter on correct target) ─────────────────────── */
+
+.cell--locked {
+  background: #14532d;
+  border: 2px solid #22c55e;
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.35);
+}
+
+.cell--locked .letter-char {
+  color: #4ade80;
+  font-size: 1.3rem;
+}
+
+/* ── Player ──────────────────────────────────────────────────────────────── */
+
+.player {
+  color: #60a0f8;
+  font-size: 1.3rem;
+  font-weight: 900;
+}
