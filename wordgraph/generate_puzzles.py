@@ -12,6 +12,8 @@ Usage:
 import json
 import os
 
+from graph_io import load_graph
+
 # ─────────────────────────────────────────────
 # CONFIG
 # ─────────────────────────────────────────────
@@ -140,15 +142,7 @@ def main():
     print("  Word Chain — Puzzle Generator")
     print("=" * 50)
 
-    if not os.path.exists(INPUT_GRAPH):
-        print(f"\n❌ Graph file not found: {INPUT_GRAPH}")
-        print("   Run build_wordgraph.py first to generate it.")
-        return
-
-    print(f"\n📂 Loading graph from {INPUT_GRAPH}...")
-    with open(INPUT_GRAPH, "r", encoding="utf-8") as f:
-        graph = json.load(f)
-    print(f"   ✅ Loaded {len(graph):,} words")
+    graph = load_graph(INPUT_GRAPH)
 
     puzzles = generate_puzzles(PUZZLE_SEEDS, graph, chain_length=PUZZLE_CHAIN_LENGTH)
 
