@@ -1,8 +1,12 @@
 const express = require('express');
 const cors = require('cors');
+const fs = require('fs');
+const zlib = require('zlib');
 const path = require('path');
 
-const wordGraph = require('./data/wordGraph.json');
+const wordGraph = JSON.parse(
+  zlib.gunzipSync(fs.readFileSync(path.join(__dirname, './data/wordGraph.json.gz'))),
+);
 const puzzles = require('./data/puzzles.json');
 
 const app = express();

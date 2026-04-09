@@ -22,6 +22,7 @@ Requirements:
 Config below — adjust paths and thresholds to taste.
 """
 
+import gzip
 import json
 import numpy as np
 from tqdm import tqdm  # pip install tqdm
@@ -31,8 +32,9 @@ import os
 # CONFIG — adjust these
 # ─────────────────────────────────────────────
 
-VECTORS_FILE = "unversioned/wiki-news-300d-1M.vec"   # path to your .vec file
-OUTPUT_GRAPH = "unversioned/wordGraph.json"          # output: runtime validation graph
+VECTORS_FILE = "unversioned/wiki-news-300d-1M.vec"            # path to your .vec file
+OUTPUT_GRAPH = "unversioned/wordGraph.json"       # full JSON (unversioned, for inspection)
+OUTPUT_GRAPH_GZ = "unversioned/wordGraph.json.gz" # compressed — copy manually to word-chain/server/data/
 
 TOP_N_WORDS = 20000          # how many words to load (most frequent first)
 SIMILARITY_THRESHOLD = 0.40  # minimum cosine similarity to consider a link valid
@@ -199,6 +201,17 @@ def save_graph(graph, filepath):
     print(f"   ✅ Saved {len(graph):,} words ({size_mb:.1f} MB)")
 
 
+def save_graph_gz(graph, filepath):
+    """Save word graph as gzipped JSON for versioning and runtime use."""
+    print(f"\n💾 Saving compressed word graph to {filepath}...")
+    data = json.dumps(graph, separators=(',', ':')).encode('utf-8')
+    with gzip.open(filepath, 'wb', compresslevel=9) as f:
+        f.write(data)
+
+    size_mb = os.path.getsize(filepath) / 1024 / 1024
+    print(f"   ✅ Saved {len(graph):,} words ({size_mb:.1f} MB compressed)")
+
+
 # ─────────────────────────────────────────────
 # MAIN
 # ─────────────────────────────────────────────
@@ -227,11 +240,15 @@ def main():
         threshold=SIMILARITY_THRESHOLD
     )
 
-    # Step 4: Save graph (needed by the app at runtime)
+    # Step 4: Save full JSON (for local inspection)
     save_graph(graph, OUTPUT_GRAPH)
 
+    # Step 5: Save compressed version (versioned, used at runtime)
+    save_graph_gz(graph, OUTPUT_GRAPH_GZ)
+
     print("\n✅ Done!")
-    print(f"   {OUTPUT_GRAPH} → ship this with your app for runtime validation")
+    print(f"   {OUTPUT_GRAPH} → full JSON for local inspection")
+    print(f"   {OUTPUT_GRAPH_GZ} → copy to word-chain/server/data/ to deploy")
     print(f"   Run generate_puzzles.py to generate puzzles from the graph")
 
 

@@ -6,6 +6,8 @@ const STEPS = 3;
 export function GameBoard({ puzzle, onWin, onHome, onNextLevel }) {
   const [inputs, setInputs] = useState(Array(STEPS).fill(''));
   const [inputStates, setInputStates] = useState(Array(STEPS).fill(null)); // null | 'valid' | 'invalid'
+  const [startNodeState, setStartNodeState] = useState(null); // null | 'valid' | 'invalid'
+  const [endNodeState, setEndNodeState] = useState(null); // null | 'valid' | 'invalid'
   const [gameState, setGameState] = useState('playing'); // 'playing' | 'won' | 'failed'
   const [checking, setChecking] = useState(false);
   const [stepCount, setStepCount] = useState(null);
@@ -14,6 +16,8 @@ export function GameBoard({ puzzle, onWin, onHome, onNextLevel }) {
   useEffect(() => {
     setInputs(Array(STEPS).fill(''));
     setInputStates(Array(STEPS).fill(null));
+    setStartNodeState(null);
+    setEndNodeState(null);
     setGameState('playing');
     setStepCount(null);
     setTimeout(() => inputRefs.current[0]?.focus(), 50);
@@ -71,13 +75,25 @@ export function GameBoard({ puzzle, onWin, onHome, onNextLevel }) {
     const prev = prevWordFor(index);
     const next = nextWordFor(index);
 
-    const [linkIn, linkOut] = await Promise.all([checkLink(prev, word), checkLink(word, next)]);
+    const toEnd = next === puzzle.end;
+    const [linkIn, linkOut] = await Promise.all([
+      checkLink(prev, word),
+      toEnd ? checkLink(word, puzzle.end) : Promise.resolve(null),
+    ]);
 
     setInputStates((s) => {
-      const next = [...s];
-      next[index] = linkIn && linkOut ? 'valid' : 'invalid';
-      return next;
+      const ns = [...s];
+      ns[index] = linkIn ? 'valid' : 'invalid';
+      return ns;
     });
+
+    if (prev === puzzle.start) {
+      setStartNodeState(linkIn ? 'valid' : 'invalid');
+    }
+
+    if (toEnd) {
+      setEndNodeState(linkOut ? 'valid' : 'invalid');
+    }
   }
 
   async function handleSubmit() {
@@ -118,6 +134,8 @@ export function GameBoard({ puzzle, onWin, onHome, onNextLevel }) {
   function handleReset() {
     setInputs(Array(STEPS).fill(''));
     setInputStates(Array(STEPS).fill(null));
+    setStartNodeState(null);
+    setEndNodeState(null);
     setGameState('playing');
     setStepCount(null);
     setTimeout(() => inputRefs.current[0]?.focus(), 50);
@@ -138,7 +156,7 @@ export function GameBoard({ puzzle, onWin, onHome, onNextLevel }) {
         {/* Start word */}
         <div className="chain-item">
           <div className="word-node fixed">
-            <span className="word-fixed">{puzzle.start.toUpperCase()}</span>
+            <span className={`word-fixed ${startNodeState === 'valid' ? 'node-valid' : startNodeState === 'invalid' ? 'node-invalid' : ''}`}>{puzzle.start.toUpperCase()}</span>
           </div>
           <div className="link-arrow">
             <span className="arrow-line" />
@@ -175,7 +193,7 @@ export function GameBoard({ puzzle, onWin, onHome, onNextLevel }) {
         {/* End word */}
         <div className="chain-item">
           <div className="word-node fixed">
-            <span className="word-fixed">{puzzle.end.toUpperCase()}</span>
+            <span className={`word-fixed ${endNodeState === 'valid' ? 'node-valid' : endNodeState === 'invalid' ? 'node-invalid' : ''}`}>{puzzle.end.toUpperCase()}</span>
           </div>
         </div>
       </div>

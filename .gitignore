@@ -7,4 +7,5 @@
 
 # claude code — share launch config, keep local settings private
 .claude/settings.local.json
-wordgraph/unversioned
+wordgraph/unversioned/*
+word-chain/server/data/wordGraph.json
