@@ -4,6 +4,11 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  transition: max-width 0.2s;
+}
+
+.app.app-wide {
+  max-width: 520px;
 }
 
 .app-header {

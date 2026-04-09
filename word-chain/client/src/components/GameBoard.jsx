@@ -3,7 +3,7 @@ import './GameBoard.css';
 
 const STEPS = 3;
 
-export default function GameBoard({ puzzle, onNewPuzzle }) {
+export function GameBoard({ puzzle, onWin, onHome, onNextLevel }) {
   const [inputs, setInputs] = useState(Array(STEPS).fill(''));
   const [inputStates, setInputStates] = useState(Array(STEPS).fill(null)); // null | 'valid' | 'invalid'
   const [gameState, setGameState] = useState('playing'); // 'playing' | 'won' | 'failed'
@@ -23,7 +23,6 @@ export default function GameBoard({ puzzle, onNewPuzzle }) {
     const next = [...inputs];
     next[index] = value.toLowerCase().replace(/[^a-z]/g, '');
     setInputs(next);
-    // Clear validation state for this input when it changes
     setInputStates((prev) => {
       const s = [...prev];
       s[index] = null;
@@ -41,7 +40,6 @@ export default function GameBoard({ puzzle, onNewPuzzle }) {
     }
   }
 
-  // Find the effective previous word in the chain for a given input index
   function prevWordFor(index) {
     for (let i = index - 1; i >= 0; i--) {
       if (inputs[i].trim()) return inputs[i].trim();
@@ -49,7 +47,6 @@ export default function GameBoard({ puzzle, onNewPuzzle }) {
     return puzzle.start;
   }
 
-  // Find the effective next word in the chain for a given input index
   function nextWordFor(index) {
     for (let i = index + 1; i < STEPS; i++) {
       if (inputs[i].trim()) return inputs[i].trim();
@@ -86,7 +83,7 @@ export default function GameBoard({ puzzle, onNewPuzzle }) {
   async function handleSubmit() {
     if (gameState !== 'playing') return;
     const chain = [puzzle.start, ...inputs.map((w) => w.trim()).filter(Boolean), puzzle.end];
-    if (chain.length < 3) return; // need at least 1 middle word
+    if (chain.length < 3) return;
 
     setChecking(true);
     try {
@@ -97,11 +94,9 @@ export default function GameBoard({ puzzle, onNewPuzzle }) {
       });
       const data = await res.json();
 
-      // Map link results back to input indices
       const filledIndices = inputs.map((w, i) => ({ w: w.trim(), i })).filter((x) => x.w);
       const newStates = [...inputStates];
       filledIndices.forEach(({ i }, chainPos) => {
-        // link into this word = data.links[chainPos], link out = data.links[chainPos + 1]
         const linkIn = data.links[chainPos];
         const linkOut = data.links[chainPos + 1];
         newStates[i] = linkIn.valid && linkOut.valid ? 'valid' : 'invalid';
@@ -109,8 +104,9 @@ export default function GameBoard({ puzzle, onNewPuzzle }) {
       setInputStates(newStates);
 
       if (data.valid) {
-        setStepCount(chain.length - 2); // number of middle words used
+        setStepCount(chain.length - 2);
         setGameState('won');
+        onWin(puzzle.id);
       } else {
         setGameState('failed');
       }
@@ -131,6 +127,13 @@ export default function GameBoard({ puzzle, onNewPuzzle }) {
 
   return (
     <div className="game-board">
+      <div className="game-board-header">
+        <button className="btn-back" onClick={onHome}>
+          ← Levels
+        </button>
+        <span className="level-label">Level {puzzle.id}</span>
+      </div>
+
       <div className="chain">
         {/* Start word */}
         <div className="chain-item">
@@ -203,16 +206,27 @@ export default function GameBoard({ puzzle, onNewPuzzle }) {
           </>
         )}
 
-        {gameState !== 'playing' && (
+        {gameState === 'won' && (
           <>
-            <button className="btn btn-primary" onClick={onNewPuzzle}>
-              New Puzzle
-            </button>
-            {gameState === 'failed' && (
-              <button className="btn btn-ghost" onClick={handleReset}>
-                Try Again
+            {onNextLevel && (
+              <button className="btn btn-primary" onClick={onNextLevel}>
+                Next Level →
               </button>
             )}
+            <button className="btn btn-ghost" onClick={onHome}>
+              All Levels
+            </button>
+          </>
+        )}
+
+        {gameState === 'failed' && (
+          <>
+            <button className="btn btn-primary" onClick={handleReset}>
+              Try Again
+            </button>
+            <button className="btn btn-ghost" onClick={onHome}>
+              All Levels
+            </button>
           </>
         )}
       </div>

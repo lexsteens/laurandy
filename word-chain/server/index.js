@@ -21,6 +21,11 @@ function isLinked(wordA, wordB) {
   return Array.isArray(neighbors) && neighbors.includes(b);
 }
 
+// GET /api/puzzles
+app.get('/api/puzzles', (req, res) => {
+  res.json(puzzles.map(({ id, start, end }) => ({ id, start, end })));
+});
+
 // GET /api/puzzle/random
 app.get('/api/puzzle/random', (req, res) => {
   const puzzle = puzzles[Math.floor(Math.random() * puzzles.length)];
