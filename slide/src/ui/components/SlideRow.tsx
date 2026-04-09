@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { getCenterLetterIndex } from '../../game/engine';
+import { useCallback, useEffect, useState } from 'react';
+import { getCenterLetterIndex, getMinOffset, getMaxOffset } from '../../game/engine';
 
 const TILE_WIDTH = 44;
 const TILE_GAP = 6;
@@ -14,18 +14,14 @@ type Props = {
 
 export function SlideRow({ word, offset, flash, onSlide }: Props) {
   const centerIndex = getCenterLetterIndex(word.length, offset);
-  const tilesRef = useRef<HTMLDivElement>(null);
   const [dragStartX, setDragStartX] = useState<number | null>(null);
 
-  // Position tiles so the center letter always aligns with 50% of the parent.
-  // left: 50% puts the tile group's LEFT edge at parent center.
-  // We then shift so tile[centerIndex] center lands at parent center:
-  //   shift = -(centerIndex * TILE_STEP + TILE_WIDTH / 2)
-  // As offset changes, the whole group shifts by offset * TILE_STEP relative to the
-  // base where centerIndex=Math.floor(word.length/2).
   const baseCenterIndex = Math.floor(word.length / 2);
   const translateX = (offset - baseCenterIndex) * TILE_STEP - TILE_WIDTH / 2;
   const tileStyle = { transform: `translateX(${translateX}px)` };
+
+  const canSlideLeft = offset > getMinOffset(word.length);
+  const canSlideRight = offset < getMaxOffset(word.length);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -71,10 +67,6 @@ export function SlideRow({ word, offset, flash, onSlide }: Props) {
 
   return (
     <div className={`slide-row${flash ? ' slide-row--flash' : ''}`}>
-      <button className="slide-row__btn" onClick={() => onSlide(-1)} aria-label="Slide left">
-        ←
-      </button>
-
       <div
         className="slide-row__tiles-area"
         onMouseDown={handleMouseDown}
@@ -82,10 +74,14 @@ export function SlideRow({ word, offset, flash, onSlide }: Props) {
         tabIndex={0}
         aria-label={`Row: ${word.toUpperCase()}`}
       >
+        {/* edge fade hints */}
+        {canSlideLeft && <div className="slide-row__hint slide-row__hint--left" />}
+        {canSlideRight && <div className="slide-row__hint slide-row__hint--right" />}
+
         {/* center column stripe */}
         <div className="slide-row__stripe" />
 
-        <div ref={tilesRef} className="slide-row__tiles" style={tileStyle}>
+        <div className="slide-row__tiles" style={tileStyle}>
           {word.split('').map((letter, i) => (
             <div
               key={i}
@@ -96,10 +92,6 @@ export function SlideRow({ word, offset, flash, onSlide }: Props) {
           ))}
         </div>
       </div>
-
-      <button className="slide-row__btn" onClick={() => onSlide(1)} aria-label="Slide right">
-        →
-      </button>
     </div>
   );
 }

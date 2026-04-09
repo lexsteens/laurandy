@@ -84,7 +84,6 @@ body {
 .slide-row {
   display: flex;
   align-items: center;
-  gap: 8px;
 }
 
 .slide-row--flash .slide-row__tile--center {
@@ -95,30 +94,6 @@ body {
     background 0.1s,
     border-color 0.1s,
     color 0.1s;
-}
-
-.slide-row__btn {
-  flex-shrink: 0;
-  width: 36px;
-  height: 36px;
-  background: #1e1e2e;
-  border: 1px solid #3a3a5c;
-  border-radius: 6px;
-  color: #888;
-  font-size: 18px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition:
-    border-color 0.15s,
-    color 0.15s;
-  user-select: none;
-}
-
-.slide-row__btn:hover {
-  border-color: #6c63ff;
-  color: #e0e0e0;
 }
 
 .slide-row__tiles-area {
@@ -137,6 +112,26 @@ body {
 .slide-row__tiles-area:focus {
   outline: 2px solid #6c63ff;
   outline-offset: 2px;
+}
+
+/* edge fade hints — show when more letters can slide in */
+.slide-row__hint {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.slide-row__hint--left {
+  left: 0;
+  background: linear-gradient(to right, #0f0f1a 0%, transparent 100%);
+}
+
+.slide-row__hint--right {
+  right: 0;
+  background: linear-gradient(to left, #0f0f1a 0%, transparent 100%);
 }
 
 /* center column stripe */
