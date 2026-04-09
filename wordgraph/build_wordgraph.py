@@ -110,70 +110,48 @@ def normalize_vectors(vectors):
     return normalized
 
 
-def batch_similarities(target_vec, all_vecs_matrix, word_list):
-    """
-    Compute cosine similarity between one vector and all others efficiently.
-    Uses matrix multiplication — much faster than looping.
-    Returns: list of (word, score) sorted by score descending
-    """
-    scores = all_vecs_matrix @ target_vec  # matrix multiply
-    # Get top indices (argsort descending)
-    top_indices = np.argsort(-scores)
-    return [(word_list[i], float(scores[i])) for i in top_indices]
-
-
 # ─────────────────────────────────────────────
 # STEP 3: BUILD WORD GRAPH
 # ─────────────────────────────────────────────
 
+CHUNK_SIZE = 1000  # rows per chunk — trades memory for speed (~80MB/chunk at 20k words)
+
 def build_word_graph(normalized_vectors, threshold=0.40):
     """
-    For each word, find all neighbors above the threshold.
-    Returns: dict of {word: [neighbor1, neighbor2, ...]}
+    Build the word graph using chunked matrix multiplication.
 
-    Neighbors are stored as a list (no scores) to keep JSON small.
-    The presence in the list means "valid link".
+    Computes the full similarity matrix in row-chunks (chunk @ matrix.T),
+    avoiding a Python loop per word. Cosine similarity is symmetric, so both
+    directions are captured in one pass — no bidirectionality fix-up needed.
+
+    Returns: dict of {word: [neighbor1, neighbor2, ...]}
     """
     print(f"\n🕸️  Building word graph...")
     print(f"   {len(normalized_vectors):,} words @ threshold {threshold}")
 
     words = list(normalized_vectors.keys())
-    # Stack all vectors into a matrix for fast batch computation
-    matrix = np.stack([normalized_vectors[w] for w in words])  # shape: (vocab, dims)
+    n = len(words)
+    matrix = np.stack([normalized_vectors[w] for w in words])  # (n, dims)
 
-    graph = {}
-    rejected_count = 0
+    graph = {w: [] for w in words}
 
-    for i, word in enumerate(tqdm(words, desc="   Processing")):
-        target_vec = normalized_vectors[word]
+    for start in tqdm(range(0, n, CHUNK_SIZE), desc="   Processing"):
+        end = min(start + CHUNK_SIZE, n)
+        scores = matrix[start:end] @ matrix.T  # (chunk, n)
 
-        # Batch cosine similarity against all words
-        all_scores = batch_similarities(target_vec, matrix, words)
+        for i, row in enumerate(scores):
+            word_idx = start + i
+            neighbor_indices = np.where(row >= threshold)[0]
+            graph[words[word_idx]] = [
+                words[j] for j in neighbor_indices if j != word_idx
+            ]
 
-        # Filter: skip self, apply threshold
-        neighbors = []
-        for other_word, score in all_scores:
-            if other_word == word:
-                continue
-            if score < threshold:
-                break  # sorted descending, so we can stop early
-            neighbors.append(other_word)
-
-        if neighbors:
-            graph[word] = neighbors
-        else:
-            rejected_count += 1
+    rejected = sum(1 for ns in graph.values() if not ns)
+    graph = {w: ns for w, ns in graph.items() if ns}
 
     print(f"   ✅ Graph built: {len(graph):,} words with neighbors")
-    print(f"   ⚠️  {rejected_count:,} words had no neighbors above threshold")
+    print(f"   ⚠️  {rejected:,} words had no neighbors above threshold")
 
-    # Make all links bidirectional
-    for word, neighbors in list(graph.items()):
-        for neighbor in neighbors:
-            if neighbor in graph and word not in graph[neighbor]:
-                graph[neighbor].append(word)
-
-    # Stats
     neighbor_counts = [len(v) for v in graph.values()]
     print(f"   📊 Avg neighbors per word: {np.mean(neighbor_counts):.1f}")
     print(f"   📊 Min neighbors: {min(neighbor_counts)}, Max: {max(neighbor_counts)}")
