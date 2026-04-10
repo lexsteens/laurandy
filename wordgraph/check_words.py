@@ -15,43 +15,10 @@ Example:
 import os
 import sys
 
-import numpy as np
-
-from graph_io import load_graph
+from graph_utils import load_graph, load_vectors_for_words, cosine_similarity
 
 INPUT_GRAPH = "unversioned/wordGraph.json"
-VECTORS_FILE = "unversioned/wiki-news-300d-1M.vec"
-TOP_N_WORDS = 20000
-
-
-def load_vector(filepath, target_words, top_n):
-    """Load vectors for specific words from the .vec file.
-    Scans the full top_n valid words (same logic as build_wordgraph) to ensure
-    the same vector is used as during graph construction."""
-    found = {}
-    loaded = 0
-    with open(filepath, "r", encoding="utf-8") as f:
-        header = f.readline()
-        _, dims = map(int, header.strip().split())
-        for line in f:
-            if loaded >= top_n:
-                break
-            parts = line.rstrip().split(" ")
-            word = parts[0].lower()
-            if not word.isalpha() or len(word) < 3:
-                continue
-            loaded += 1
-            if word in target_words:
-                found[word] = np.array(parts[1:], dtype=np.float32)
-    return found, dims
-
-
-def cosine_similarity(vec_a, vec_b):
-    norm_a = np.linalg.norm(vec_a)
-    norm_b = np.linalg.norm(vec_b)
-    if norm_a == 0 or norm_b == 0:
-        return 0.0
-    return float(np.dot(vec_a, vec_b) / (norm_a * norm_b))
+VECTORS_DIR = "unversioned"
 
 
 def check_chain(words, graph, vectors):
@@ -75,17 +42,23 @@ def main():
 
     words = [w.lower() for w in sys.argv[1:]]
 
-    graph = load_graph(INPUT_GRAPH)
+    graph, meta = load_graph(INPUT_GRAPH)
+
+    vectors_file = os.path.join(VECTORS_DIR, meta.get("vectors_file", ""))
+    top_n = meta.get("top_n_words", 20000)
 
     for w in words:
         if w not in graph:
             print(f"❌ '{w}' not in graph")
             sys.exit(1)
-        print(f"  {w.upper()}: {len(graph[w])} links")
+        neighbors = graph[w]
+        print(f"  {w.upper()} ({len(neighbors)}): {', '.join(neighbors)}")
 
     vectors = {}
-    if os.path.exists(VECTORS_FILE):
-        vectors, _ = load_vector(VECTORS_FILE, set(words), TOP_N_WORDS)
+    if vectors_file and os.path.exists(vectors_file):
+        vectors, _ = load_vectors_for_words(vectors_file, set(words), top_n)
+    elif not vectors_file:
+        print("⚠️  No vectors_file in graph metadata — cosine similarity unavailable")
 
     print()
     check_chain(words, graph, vectors)

@@ -12,7 +12,7 @@ Usage:
 import json
 import os
 
-from graph_io import load_graph
+from graph_utils import load_graph
 
 # ─────────────────────────────────────────────
 # CONFIG
@@ -142,7 +142,7 @@ def main():
     print("  Word Chain — Puzzle Generator")
     print("=" * 50)
 
-    graph = load_graph(INPUT_GRAPH)
+    graph, _ = load_graph(INPUT_GRAPH)
 
     puzzles = generate_puzzles(PUZZLE_SEEDS, graph, chain_length=PUZZLE_CHAIN_LENGTH)
 

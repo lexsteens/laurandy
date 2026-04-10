@@ -27,14 +27,17 @@ import json
 import numpy as np
 from tqdm import tqdm  # pip install tqdm
 import os
+import shutil
 
 # ─────────────────────────────────────────────
 # CONFIG — adjust these
 # ─────────────────────────────────────────────
 
-VECTORS_FILE = "unversioned/wiki-news-300d-1M.vec"            # path to your .vec file
-OUTPUT_GRAPH = "unversioned/wordGraph.json"       # full JSON (unversioned, for inspection)
-OUTPUT_GRAPH_GZ = "unversioned/wordGraph.json.gz" # compressed — copy manually to word-chain/server/data/
+VECTORS_FILE = "unversioned/wiki-news-300d-1M.vec"              # path to your .vec file
+MANUAL_GRAPH = "wordgraph-manual.json"                # hand-curated links, merged after build
+OUTPUT_GRAPH = "unversioned/wordGraph.json"           # full JSON (unversioned, for inspection)
+OUTPUT_GRAPH_GZ = "unversioned/wordGraph.json.gz"     # compressed JSON
+DEPLOY_GRAPH_GZ = "../word-chain/server/data/wordGraph.json.gz"  # deployed copy
 
 TOP_N_WORDS = 20000          # how many words to load (most frequent first)
 SIMILARITY_THRESHOLD = 0.40  # minimum cosine similarity to consider a link valid
@@ -163,29 +166,29 @@ def build_word_graph(normalized_vectors, threshold=0.40):
 # STEP 4: SAVE OUTPUT
 # ─────────────────────────────────────────────
 
-def save_graph(graph, filepath):
-    """Save word graph to JSON, one word per line."""
+def save_graph(graph, meta, filepath):
+    """Save word graph to JSON, one word per line, with _meta as the first entry."""
     print(f"\n💾 Saving word graph to {filepath}...")
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write('{\n')
+        meta_json = json.dumps(meta, separators=(',', ':'))
+        f.write(f'"_meta":{meta_json},\n')
         items = list(graph.items())
         for i, (word, neighbors) in enumerate(items):
             comma = ',' if i < len(items) - 1 else ''
             neighbors_json = json.dumps(neighbors, separators=(',', ':'))
             f.write(f'"{word}":{neighbors_json}{comma}\n')
         f.write('}')
-
     size_mb = os.path.getsize(filepath) / 1024 / 1024
     print(f"   ✅ Saved {len(graph):,} words ({size_mb:.1f} MB)")
 
 
-def save_graph_gz(graph, filepath):
-    """Save word graph as gzipped JSON for versioning and runtime use."""
+def save_graph_gz(graph, meta, filepath):
+    """Save word graph as gzipped JSON for word-chain runtime use."""
     print(f"\n💾 Saving compressed word graph to {filepath}...")
-    data = json.dumps(graph, separators=(',', ':')).encode('utf-8')
+    data = json.dumps({"_meta": meta, **graph}, separators=(',', ':')).encode('utf-8')
     with gzip.open(filepath, 'wb', compresslevel=9) as f:
         f.write(data)
-
     size_mb = os.path.getsize(filepath) / 1024 / 1024
     print(f"   ✅ Saved {len(graph):,} words ({size_mb:.1f} MB compressed)")
 
@@ -218,15 +221,47 @@ def main():
         threshold=SIMILARITY_THRESHOLD
     )
 
+    # Merge manual overrides
+    if os.path.exists(MANUAL_GRAPH):
+        print(f"\n📖 Merging manual links from {MANUAL_GRAPH}...")
+        with open(MANUAL_GRAPH, "r", encoding="utf-8") as f:
+            manual = json.load(f)
+        added = 0
+        for word, neighbors in manual.items():
+            word = word.lower()
+            if isinstance(neighbors, str):
+                print(f"   ❌ '{word}' value must be a list, not a string. Fix {MANUAL_GRAPH}.")
+                return
+            for neighbor in neighbors:
+                neighbor = neighbor.lower()
+                graph.setdefault(word, [])
+                if neighbor not in graph[word]:
+                    graph[word].append(neighbor)
+                    added += 1
+                graph.setdefault(neighbor, [])
+                if word not in graph[neighbor]:
+                    graph[neighbor].append(word)
+        print(f"   ✅ Added {added:,} manual links")
+
+    meta = {
+        "vectors_file": os.path.basename(VECTORS_FILE),
+        "top_n_words": TOP_N_WORDS,
+        "similarity_threshold": SIMILARITY_THRESHOLD,
+        "word_count": len(graph),
+    }
+
     # Step 4: Save full JSON (for local inspection)
-    save_graph(graph, OUTPUT_GRAPH)
+    save_graph(graph, meta, OUTPUT_GRAPH)
 
     # Step 5: Save compressed version (versioned, used at runtime)
-    save_graph_gz(graph, OUTPUT_GRAPH_GZ)
+    save_graph_gz(graph, meta, OUTPUT_GRAPH_GZ)
 
     print("\n✅ Done!")
+    shutil.copy2(OUTPUT_GRAPH_GZ, DEPLOY_GRAPH_GZ)
+    print(f"   ✅ Copied to {DEPLOY_GRAPH_GZ}")
+
     print(f"   {OUTPUT_GRAPH} → full JSON for local inspection")
-    print(f"   {OUTPUT_GRAPH_GZ} → copy to word-chain/server/data/ to deploy")
+    print(f"   {OUTPUT_GRAPH_GZ} → {DEPLOY_GRAPH_GZ}")
     print(f"   Run generate_puzzles.py to generate puzzles from the graph")
 
 

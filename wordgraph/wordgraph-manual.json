@@ -1,0 +1,6 @@
+{
+  "cold": ["ice"],
+  "moon": ["night"],
+  "wet": ["water", "ocean"],
+  "electricity": ["lightning"]
+}
