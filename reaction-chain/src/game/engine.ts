@@ -77,6 +77,18 @@ export function applyChainSteps(
   return { steps, explosions };
 }
 
+export function ballsPerRound(round: number): number {
+  return 3 + Math.floor((round - 1) / 2);
+}
+
+export function generateDropPositions(round: number): [number, number][] {
+  const count = ballsPerRound(round);
+  return Array.from(
+    { length: count },
+    () => [Math.floor(Math.random() * ROWS), Math.floor(Math.random() * COLS)] as [number, number],
+  );
+}
+
 function checkWin(grid: Grid): boolean {
   return grid.every((row) => row.every((cell) => cell > 0));
 }

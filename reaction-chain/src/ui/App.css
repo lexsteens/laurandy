@@ -24,6 +24,95 @@ body {
   padding: 24px 16px;
 }
 
+/* ── Home screen ─────────────────────────────────────────────────── */
+
+.home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  padding: 48px 24px;
+}
+
+.mode-grid {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.mode-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 240px;
+  padding: 28px 24px;
+  background: #111827;
+  border: 1px solid #1e3a5f;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.mode-card:hover {
+  border-color: #3b82f6;
+  background: #0f1f35;
+  transform: translateY(-2px);
+}
+
+.mode-card--survival {
+  border-color: #4c1d95;
+}
+
+.mode-card--survival:hover {
+  border-color: #7c3aed;
+  background: #1a0a2e;
+}
+
+.mode-card__name {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.mode-card__desc {
+  font-size: 0.82rem;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.mode-card__play {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #3b82f6;
+  margin-top: 4px;
+}
+
+.mode-card--survival .mode-card__play {
+  color: #a78bfa;
+}
+
+/* ── Back button ─────────────────────────────────────────────────── */
+
+.back-btn {
+  padding: 10px 16px;
+  background: transparent;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  color: #475569;
+  font-size: 0.9rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.back-btn:hover {
+  border-color: #334155;
+  color: #94a3b8;
+}
+
 .title {
   font-size: 2rem;
   font-weight: 800;
@@ -148,4 +237,91 @@ body {
   width: 140px;
   accent-color: #7c3aed;
   cursor: pointer;
+}
+
+/* ── HUD ─────────────────────────────────────────────────────────── */
+
+.hud {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.hud-secondary {
+  margin-top: -10px;
+}
+
+.hud-item {
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+.hud-hearts {
+  display: flex;
+  gap: 3px;
+  font-size: 1.2rem;
+}
+
+.heart {
+  transition: color 0.2s ease;
+}
+
+.heart--full {
+  color: #ef4444;
+}
+
+.heart--empty {
+  color: #1e293b;
+}
+
+.hud-stars {
+  display: flex;
+  gap: 2px;
+  font-size: 1.1rem;
+}
+
+.star {
+  transition: color 0.2s ease;
+}
+
+.star--full {
+  color: #facc15;
+  text-shadow: 0 0 6px #facc1580;
+}
+
+.star--empty {
+  color: #1e293b;
+}
+
+.hud-drops {
+  color: #7c3aed;
+  font-weight: 600;
+}
+
+.hud-clicks {
+  display: flex;
+  gap: 4px;
+  font-size: 0.7rem;
+}
+
+.click-dot {
+  color: #1e293b;
+  transition: color 0.15s ease;
+}
+
+.click-dot--done {
+  color: #7c3aed;
+}
+
+/* ── Game over ───────────────────────────────────────────────────── */
+
+.gameover-banner {
+  background: #1c1917;
+  border: 1px solid #78716c;
+  color: #a8a29e;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1.05rem;
+  animation: pop 0.3s ease;
 }
