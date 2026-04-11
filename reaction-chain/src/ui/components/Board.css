@@ -1,0 +1,33 @@
+.board {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+  width: min(90vw, 480px);
+  aspect-ratio: 1;
+}
+
+.tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    font-size 0.15s ease,
+    transform 0.08s ease;
+  aspect-ratio: 1;
+}
+
+.tile:hover {
+  transform: scale(1.05);
+  filter: brightness(1.2);
+}
+
+.tile:active {
+  transform: scale(0.95);
+}
