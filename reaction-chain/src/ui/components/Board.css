@@ -64,27 +64,20 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #c8ccd4;
-  box-shadow:
-    0 0 3px 1px rgba(200, 210, 230, 0.35),
-    0 0 6px 2px rgba(180, 190, 210, 0.15);
+  background: var(--ball-gradient);
+  box-shadow: var(--ball-shadow);
   /* center each ball on its anchor point */
   transform: translate(-50%, -50%);
 }
 
 .tile--exploding {
-  box-shadow:
-    0 0 12px 4px rgba(249, 115, 22, 0.7),
-    0 0 28px 10px rgba(251, 191, 36, 0.35);
+  box-shadow: var(--tile-exp-shadow);
   z-index: 1;
 }
 
 .tile-ball-exploding {
-  background: #fff7ed;
-  box-shadow:
-    0 0 8px 3px rgba(251, 191, 36, 1),
-    0 0 20px 6px rgba(249, 115, 22, 0.7),
-    0 0 36px 10px rgba(239, 68, 68, 0.3);
+  background: var(--ball-exp-fill);
+  box-shadow: var(--ball-exp-shadow);
   animation: ball-pop 0.18s cubic-bezier(0.22, 1.8, 0.4, 1) both;
 }
 
@@ -109,12 +102,8 @@
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: radial-gradient(circle, #fff 15%, #fde68a 40%, #f97316 75%, #dc2626 100%);
-  box-shadow:
-    0 0 8px 3px #fff,
-    0 0 16px 6px #fbbf24,
-    0 0 32px 12px #f9731699,
-    0 0 48px 18px #dc262640;
+  background: var(--particle-gradient);
+  box-shadow: var(--particle-shadow);
   pointer-events: none;
   z-index: 10;
   opacity: 0;

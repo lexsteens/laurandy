@@ -8,6 +8,7 @@ import {
 import type { Grid } from '../game/types';
 import { Board } from './components/Board';
 import type { Particle } from './components/Board';
+import { ThemeToggle } from './theme';
 import './App.css';
 
 const MAX_HEARTS = 5;
@@ -252,6 +253,7 @@ export function SurvivalMode({ onBack }: { onBack: () => void }) {
           <button className="reset-btn" onClick={handleReset}>
             Reset
           </button>
+          <ThemeToggle />
         </div>
       </div>
     </div>

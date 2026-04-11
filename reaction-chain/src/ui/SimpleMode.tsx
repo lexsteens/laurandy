@@ -3,6 +3,7 @@ import { createInitialState, applyChainSteps } from '../game/engine';
 import type { Grid } from '../game/types';
 import { Board } from './components/Board';
 import type { Particle } from './components/Board';
+import { ThemeToggle } from './theme';
 import './App.css';
 
 const MIN_DELAY = 60;
@@ -153,6 +154,7 @@ export function SimpleMode({ onBack }: { onBack: () => void }) {
           >
             {showBalls ? 'Balls' : 'Numbers'}
           </button>
+          <ThemeToggle />
         </div>
         <div className="sliders-row">
           <div className="slider-group">

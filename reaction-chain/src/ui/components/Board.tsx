@@ -20,8 +20,7 @@ type Props = {
   showBalls: boolean;
 };
 
-const TILE_BG = ['#111827', '#1e3a5f', '#7c3aed', '#b91c1c'];
-const EXPLODING_BG = '#dc2626';
+const TILE_VAR = ['var(--tile-bg-0)', 'var(--tile-bg-1)', 'var(--tile-bg-2)', 'var(--tile-bg-3)'];
 const GAP = 4;
 
 // Ball anchor positions [left%, top%] within the tile. Balls are centered on
@@ -144,7 +143,7 @@ export function Board({
               key={`${r}-${c}`}
               className={`tile${isExploding ? ' tile--exploding' : ''}`}
               style={{
-                backgroundColor: isExploding ? EXPLODING_BG : TILE_BG[value],
+                backgroundColor: isExploding ? 'var(--tile-exploding)' : TILE_VAR[value],
                 fontSize: showBalls ? '0px' : ['0px', '14px', '22px', '34px'][value],
                 color: '#fff',
                 fontWeight: 700,
