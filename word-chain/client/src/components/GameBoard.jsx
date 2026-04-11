@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import './GameBoard.css';
 
-const STEPS = 3;
+const MAX_STEPS = 10;
 
 export function GameBoard({ puzzle, onWin, onHome, onNextLevel }) {
-  const [inputs, setInputs] = useState(Array(STEPS).fill(''));
-  const [inputStates, setInputStates] = useState(Array(STEPS).fill(null)); // null | 'valid' | 'invalid'
+  const [inputs, setInputs] = useState(['']);
+  const [inputStates, setInputStates] = useState([null]); // null | 'valid' | 'invalid'
   const [startNodeState, setStartNodeState] = useState(null); // null | 'valid' | 'invalid'
   const [endNodeState, setEndNodeState] = useState(null); // null | 'valid' | 'invalid'
   const [gameState, setGameState] = useState('playing'); // 'playing' | 'won' | 'failed'
@@ -14,8 +14,8 @@ export function GameBoard({ puzzle, onWin, onHome, onNextLevel }) {
   const inputRefs = useRef([]);
 
   useEffect(() => {
-    setInputs(Array(STEPS).fill(''));
-    setInputStates(Array(STEPS).fill(null));
+    setInputs(['']);
+    setInputStates([null]);
     setStartNodeState(null);
     setEndNodeState(null);
     setGameState('playing');
@@ -36,10 +36,10 @@ export function GameBoard({ puzzle, onWin, onHome, onNextLevel }) {
 
   function handleKeyDown(index, e) {
     if (e.key === 'Enter') {
-      if (index < STEPS - 1) {
+      if (index < inputs.length - 1) {
         inputRefs.current[index + 1]?.focus();
       } else {
-        handleSubmit();
+        inputRefs.current[index]?.blur();
       }
     }
   }
@@ -49,13 +49,6 @@ export function GameBoard({ puzzle, onWin, onHome, onNextLevel }) {
       if (inputs[i].trim()) return inputs[i].trim();
     }
     return puzzle.start;
-  }
-
-  function nextWordFor(index) {
-    for (let i = index + 1; i < STEPS; i++) {
-      if (inputs[i].trim()) return inputs[i].trim();
-    }
-    return puzzle.end;
   }
 
   async function checkLink(from, to) {
@@ -73,12 +66,11 @@ export function GameBoard({ puzzle, onWin, onHome, onNextLevel }) {
     if (!word) return;
 
     const prev = prevWordFor(index);
-    const next = nextWordFor(index);
+    const isLastSlot = index === inputs.length - 1;
 
-    const toEnd = next === puzzle.end;
     const [linkIn, linkOut] = await Promise.all([
       checkLink(prev, word),
-      toEnd ? checkLink(word, puzzle.end) : Promise.resolve(null),
+      isLastSlot ? checkLink(word, puzzle.end) : Promise.resolve(null),
     ]);
 
     setInputStates((s) => {
@@ -91,8 +83,16 @@ export function GameBoard({ puzzle, onWin, onHome, onNextLevel }) {
       setStartNodeState(linkIn ? 'valid' : 'invalid');
     }
 
-    if (toEnd) {
+    if (isLastSlot) {
       setEndNodeState(linkOut ? 'valid' : 'invalid');
+
+      // Add a new slot if this word connects in but not yet to end
+      if (linkIn && !linkOut && inputs.length < MAX_STEPS) {
+        const newIndex = inputs.length;
+        setInputs((i) => [...i, '']);
+        setInputStates((s) => [...s, null]);
+        setTimeout(() => inputRefs.current[newIndex]?.focus(), 50);
+      }
     }
   }
 
@@ -132,8 +132,8 @@ export function GameBoard({ puzzle, onWin, onHome, onNextLevel }) {
   }
 
   function handleReset() {
-    setInputs(Array(STEPS).fill(''));
-    setInputStates(Array(STEPS).fill(null));
+    setInputs(['']);
+    setInputStates([null]);
     setStartNodeState(null);
     setEndNodeState(null);
     setGameState('playing');
@@ -156,7 +156,11 @@ export function GameBoard({ puzzle, onWin, onHome, onNextLevel }) {
         {/* Start word */}
         <div className="chain-item">
           <div className="word-node fixed">
-            <span className={`word-fixed ${startNodeState === 'valid' ? 'node-valid' : startNodeState === 'invalid' ? 'node-invalid' : ''}`}>{puzzle.start.toUpperCase()}</span>
+            <span
+              className={`word-fixed ${startNodeState === 'valid' ? 'node-valid' : startNodeState === 'invalid' ? 'node-invalid' : ''}`}
+            >
+              {puzzle.start.toUpperCase()}
+            </span>
           </div>
           <div className="link-arrow">
             <span className="arrow-line" />
@@ -176,7 +180,7 @@ export function GameBoard({ puzzle, onWin, onHome, onNextLevel }) {
                 onChange={(e) => handleChange(i, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(i, e)}
                 onBlur={() => handleBlur(i)}
-                placeholder={`step ${i + 1} (optional)`}
+                placeholder="word"
                 maxLength={20}
                 disabled={gameState !== 'playing'}
                 autoComplete="off"
@@ -193,7 +197,11 @@ export function GameBoard({ puzzle, onWin, onHome, onNextLevel }) {
         {/* End word */}
         <div className="chain-item">
           <div className="word-node fixed">
-            <span className={`word-fixed ${endNodeState === 'valid' ? 'node-valid' : endNodeState === 'invalid' ? 'node-invalid' : ''}`}>{puzzle.end.toUpperCase()}</span>
+            <span
+              className={`word-fixed ${endNodeState === 'valid' ? 'node-valid' : endNodeState === 'invalid' ? 'node-invalid' : ''}`}
+            >
+              {puzzle.end.toUpperCase()}
+            </span>
           </div>
         </div>
       </div>
@@ -249,7 +257,7 @@ export function GameBoard({ puzzle, onWin, onHome, onNextLevel }) {
         )}
       </div>
 
-      <p className="hint">Use 1–3 steps. Empty slots are skipped.</p>
+      <p className="hint">Tab away from each word to check the link.</p>
     </div>
   );
 }

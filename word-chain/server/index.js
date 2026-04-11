@@ -52,11 +52,11 @@ app.post('/api/check-link', (req, res) => {
 });
 
 // POST /api/validate
-// Body: { chain: [word0, word1, word2, word3, word4] }  (5 words total)
+// Body: { chain: [word0, ...middle, wordN] }  (3–12 words total: start + up to 10 middle + end)
 app.post('/api/validate', (req, res) => {
   const { chain } = req.body;
-  if (!Array.isArray(chain) || chain.length < 3 || chain.length > 5) {
-    return res.status(400).json({ error: 'Chain must contain between 3 and 5 words' });
+  if (!Array.isArray(chain) || chain.length < 3 || chain.length > 12) {
+    return res.status(400).json({ error: 'Chain must contain between 3 and 12 words' });
   }
 
   const results = [];
