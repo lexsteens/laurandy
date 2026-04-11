@@ -72,20 +72,33 @@
   transform: translate(-50%, -50%);
 }
 
-.tile-ball-exploding {
-  background: #fbbf24;
+.tile--exploding {
   box-shadow:
-    0 0 6px 2px rgba(251, 191, 36, 0.9),
-    0 0 12px 4px rgba(249, 115, 22, 0.5);
-  animation: ball-pop 0.06s ease-out both;
+    0 0 12px 4px rgba(249, 115, 22, 0.7),
+    0 0 28px 10px rgba(251, 191, 36, 0.35);
+  z-index: 1;
+}
+
+.tile-ball-exploding {
+  background: #fff7ed;
+  box-shadow:
+    0 0 8px 3px rgba(251, 191, 36, 1),
+    0 0 20px 6px rgba(249, 115, 22, 0.7),
+    0 0 36px 10px rgba(239, 68, 68, 0.3);
+  animation: ball-pop 0.18s cubic-bezier(0.22, 1.8, 0.4, 1) both;
 }
 
 @keyframes ball-pop {
   from {
     transform: translate(-50%, -50%) scale(0);
+    opacity: 0.6;
+  }
+  60% {
+    transform: translate(-50%, -50%) scale(1.6);
   }
   to {
     transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
   }
 }
 
@@ -93,14 +106,15 @@
 
 .particle {
   position: absolute;
-  width: 16px;
-  height: 16px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  background: radial-gradient(circle, #fff 20%, #fbbf24 55%, #f97316 100%);
+  background: radial-gradient(circle, #fff 15%, #fde68a 40%, #f97316 75%, #dc2626 100%);
   box-shadow:
-    0 0 10px 4px #fbbf24,
-    0 0 24px 8px #f9731680,
-    0 0 4px 1px #fff;
+    0 0 8px 3px #fff,
+    0 0 16px 6px #fbbf24,
+    0 0 32px 12px #f9731699,
+    0 0 48px 18px #dc262640;
   pointer-events: none;
   z-index: 10;
   opacity: 0;
