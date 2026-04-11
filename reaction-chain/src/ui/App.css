@@ -14,6 +14,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  /* iOS safe-area support (notch / home bar) */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .app {
@@ -22,6 +24,8 @@ body {
   align-items: center;
   gap: 20px;
   padding: 24px 16px;
+  width: 100%;
+  max-width: 560px;
 }
 
 /* ── Home screen ─────────────────────────────────────────────────── */
@@ -34,9 +38,109 @@ body {
   padding: 48px 24px;
 }
 
+/* ── Share overlay ───────────────────────────────────────────────── */
+
+.overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: fade-in 0.15s ease;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.overlay-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 32px 28px 28px;
+  background: #111827;
+  border: 1px solid #1e3a5f;
+  border-radius: 18px;
+  animation: pop 0.2s ease;
+}
+
+.overlay-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: transparent;
+  border: none;
+  color: #475569;
+  font-size: 1rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px 6px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.overlay-close:hover {
+  color: #94a3b8;
+}
+
+.qr-img {
+  width: 200px;
+  height: 200px;
+  border-radius: 10px;
+  display: block;
+}
+
+.overlay-url {
+  font-size: 0.8rem;
+  color: #475569;
+}
+
+/* ── Share button ────────────────────────────────────────────────── */
+
+.share-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  color: #475569;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.share-btn:hover {
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+.share-btn:active {
+  background: #1e293b;
+  color: #94a3b8;
+}
+
+/* ── Mode grid ───────────────────────────────────────────────────── */
+
 .mode-grid {
   display: flex;
-  gap: 20px;
+  gap: 16px;
   flex-wrap: wrap;
   justify-content: center;
 }
@@ -45,30 +149,42 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  width: 240px;
+  width: min(240px, 42vw);
+  min-width: 140px;
   padding: 28px 24px;
   background: #111827;
   border: 1px solid #1e3a5f;
-  border-radius: 12px;
+  border-radius: 14px;
   cursor: pointer;
   text-align: left;
-  transition: all 0.15s ease;
+  transition: all 0.18s ease;
   font-family: inherit;
+  /* Touch */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.mode-card:hover {
-  border-color: #3b82f6;
-  background: #0f1f35;
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .mode-card:hover {
+    border-color: #3b82f6;
+    background: #0f1f35;
+    transform: translateY(-2px);
+  }
+}
+
+.mode-card:active {
+  transform: scale(0.97);
 }
 
 .mode-card--survival {
   border-color: #4c1d95;
 }
 
-.mode-card--survival:hover {
-  border-color: #7c3aed;
-  background: #1a0a2e;
+@media (hover: hover) {
+  .mode-card--survival:hover {
+    border-color: #7c3aed;
+    background: #1a0a2e;
+  }
 }
 
 .mode-card__name {
@@ -94,24 +210,83 @@ body {
   color: #a78bfa;
 }
 
-/* ── Back button ─────────────────────────────────────────────────── */
+/* ── Buttons ─────────────────────────────────────────────────────── */
 
-.back-btn {
-  padding: 10px 16px;
-  background: transparent;
-  border: 1px solid #1e293b;
-  border-radius: 8px;
-  color: #475569;
-  font-size: 0.9rem;
+.back-btn,
+.reset-btn,
+.toggle-btn {
+  /* Minimum touch target */
+  min-height: 44px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 0.95rem;
   font-family: inherit;
   cursor: pointer;
   transition: all 0.15s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.back-btn:hover {
-  border-color: #334155;
+.back-btn {
+  background: transparent;
+  border: 1px solid #1e293b;
+  color: #475569;
+}
+
+@media (hover: hover) {
+  .back-btn:hover {
+    border-color: #334155;
+    color: #94a3b8;
+  }
+}
+
+.back-btn:active {
+  background: #1e293b;
   color: #94a3b8;
 }
+
+.reset-btn {
+  padding: 10px 32px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  color: #94a3b8;
+}
+
+@media (hover: hover) {
+  .reset-btn:hover {
+    background: #334155;
+    color: #e2e8f0;
+  }
+}
+
+.reset-btn:active {
+  background: #475569;
+  color: #e2e8f0;
+}
+
+.toggle-btn {
+  background: #1e293b;
+  border: 1px solid #334155;
+  color: #94a3b8;
+}
+
+@media (hover: hover) {
+  .toggle-btn:hover {
+    background: #334155;
+    color: #e2e8f0;
+  }
+}
+
+.toggle-btn:active {
+  background: #475569;
+}
+
+.toggle-btn--active {
+  border-color: #7c3aed;
+  color: #a78bfa;
+}
+
+/* ── Typography ──────────────────────────────────────────────────── */
 
 .title {
   font-size: 2rem;
@@ -121,19 +296,25 @@ body {
 }
 
 .subtitle {
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   color: #64748b;
   margin-top: -12px;
+  text-align: center;
+  line-height: 1.5;
+  max-width: 340px;
 }
+
+/* ── Banners ─────────────────────────────────────────────────────── */
 
 .win-banner {
   background: #14532d;
   border: 1px solid #16a34a;
   color: #86efac;
   padding: 10px 24px;
-  border-radius: 8px;
+  border-radius: 10px;
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
+  text-align: center;
   animation: pop 0.3s ease;
 }
 
@@ -152,62 +333,30 @@ body {
   }
 }
 
+/* ── Controls ────────────────────────────────────────────────────── */
+
 .controls {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  margin-top: 8px;
+  margin-top: 4px;
+  width: 100%;
 }
 
 .toggle-row {
   display: flex;
   gap: 10px;
-}
-
-.reset-btn {
-  padding: 10px 32px;
-  background: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 8px;
-  color: #94a3b8;
-  font-size: 0.95rem;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.reset-btn:hover {
-  background: #334155;
-  color: #e2e8f0;
-}
-
-.toggle-btn {
-  padding: 10px 20px;
-  background: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 8px;
-  color: #94a3b8;
-  font-size: 0.95rem;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.toggle-btn:hover {
-  background: #334155;
-  color: #e2e8f0;
-}
-
-.toggle-btn--active {
-  border-color: #7c3aed;
-  color: #a78bfa;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .sliders-row {
   display: flex;
   gap: 24px;
   align-items: flex-start;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .slider-group {
@@ -234,7 +383,7 @@ body {
 }
 
 .speed-slider {
-  width: 140px;
+  width: 130px;
   accent-color: #7c3aed;
   cursor: pointer;
 }
@@ -244,7 +393,9 @@ body {
 .hud {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .hud-secondary {
@@ -320,8 +471,42 @@ body {
   border: 1px solid #78716c;
   color: #a8a29e;
   padding: 10px 24px;
-  border-radius: 8px;
+  border-radius: 10px;
   font-weight: 600;
   font-size: 1.05rem;
+  text-align: center;
   animation: pop 0.3s ease;
+}
+
+/* ── Compact layout on small screens ────────────────────────────── */
+
+@media (max-height: 700px) {
+  .app {
+    gap: 12px;
+    padding: 16px 12px;
+  }
+  .title {
+    font-size: 1.55rem;
+  }
+  .subtitle {
+    font-size: 0.8rem;
+    margin-top: -8px;
+  }
+  .hud-secondary {
+    margin-top: -6px;
+  }
+}
+
+@media (max-width: 360px) {
+  .hud-hearts {
+    font-size: 1rem;
+    gap: 2px;
+  }
+  .hud-stars {
+    font-size: 0.9rem;
+    gap: 1px;
+  }
+  .hud {
+    gap: 10px;
+  }
 }
