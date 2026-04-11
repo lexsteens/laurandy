@@ -4,6 +4,22 @@
   gap: 4px;
   width: min(90vw, 480px);
   aspect-ratio: 1;
+  position: relative;
+}
+
+.particle {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 20%, #fbbf24 55%, #f97316 100%);
+  box-shadow:
+    0 0 10px 4px #fbbf24,
+    0 0 24px 8px #f9731680,
+    0 0 4px 1px #fff;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0;
 }
 
 .tile {
@@ -16,10 +32,7 @@
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
-  transition:
-    background-color 0.15s ease,
-    font-size 0.15s ease,
-    transform 0.08s ease;
+  transition: transform 0.08s ease;
   aspect-ratio: 1;
 }
 

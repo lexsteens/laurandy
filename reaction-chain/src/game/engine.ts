@@ -36,24 +36,45 @@ function applyChain(grid: Grid, startRow: number, startCol: number): Grid {
   return next;
 }
 
-// Returns one Grid snapshot per queue step — used by UI to animate the chain.
-export function applyChainSteps(grid: Grid, startRow: number, startCol: number): Grid[] {
-  const steps: Grid[] = [];
-  let current = grid.map((r) => [...r]);
-  const queue: [number, number][] = [[startRow, startCol]];
+export type ExplosionEvent = {
+  stepIndex: number;
+  row: number;
+  col: number;
+  toNeighbors: [number, number][];
+};
 
-  while (queue.length > 0) {
-    const [r, c] = queue.shift()!;
-    current = current.map((row) => [...row]);
-    current[r][c] += 1;
-    if (current[r][c] >= MAX) {
-      current[r][c] = 0;
-      for (const n of neighbors(r, c)) queue.push(n);
+// Returns one Grid snapshot per wave (all cells in a wave update simultaneously)
+// and explosion events. Wave-based BFS ensures that all 4 neighbors of an explosion
+// are shown in the same step.
+export function applyChainSteps(
+  grid: Grid,
+  startRow: number,
+  startCol: number,
+): { steps: Grid[]; explosions: ExplosionEvent[] } {
+  const steps: Grid[] = [];
+  const explosions: ExplosionEvent[] = [];
+  let current = grid.map((r) => [...r]);
+  let wave: [number, number][] = [[startRow, startCol]];
+
+  while (wave.length > 0) {
+    const nextWave: [number, number][] = [];
+    current = current.map((r) => [...r]);
+
+    for (const [r, c] of wave) {
+      current[r][c] += 1;
+      if (current[r][c] >= MAX) {
+        current[r][c] = 0;
+        const nbrs = neighbors(r, c);
+        for (const n of nbrs) nextWave.push(n);
+        explosions.push({ stepIndex: steps.length, row: r, col: c, toNeighbors: nbrs });
+      }
     }
-    steps.push(current.map((row) => [...row]));
+
+    steps.push(current.map((r) => [...r]));
+    wave = nextWave;
   }
 
-  return steps;
+  return { steps, explosions };
 }
 
 function checkWin(grid: Grid): boolean {
